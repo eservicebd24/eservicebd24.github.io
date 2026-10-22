@@ -33,6 +33,8 @@ function doPost(e) {
       case 'savePage': result = savePage(data.page, data.token); break;
       case 'saveSettings': result = saveSettings(data.settings, data.token); break;
       case 'getIndexHtml': result = getIndexHtml_(data.token); break;
+      case 'getPageHtml': result = getPageHtml_(data.id, data.token); break;
+      case 'savePageHtml': result = savePageHtml_(data.id, data.html, data.token); break;
       case 'saveIndexHtml': result = saveIndexHtml_(data.html, data.token); break;
       case 'deletePage': result = deletePage(data.id, data.token); break;
       case 'togglePage': result = togglePage(data.id, data.active, data.token); break;
@@ -391,6 +393,34 @@ function injectSharedShell_(html) {
   }
   return out;
 }
+
+function pageGithubPath_(row) {
+  const category = String(row[10] || 'Other').trim().toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'other';
+  return category + '/' + String(row[4] || '').trim();
+}
+function getPageHtml_(id, token) {
+  requireAdmin_(token);
+  const values = getSheet_().getDataRange().getValues();
+  const row = values.slice(1).find(r => String(r[0]) === String(id));
+  if (!row) throw new Error('পেজ পাওয়া যায়নি।');
+  const path = pageGithubPath_(row);
+  const file = githubRequest_('get', path);
+  const bytes = Utilities.base64Decode(String(file.content || '').replace(/\s/g,''));
+  return {ok:true, html:Utilities.newBlob(bytes).getDataAsString('UTF-8'), path:path};
+}
+function savePageHtml_(id, html, token) {
+  requireAdmin_(token);
+  html = String(html || '');
+  if (!/<html[\s>]/i.test(html) || !/<body[\s>]/i.test(html)) throw new Error('সম্পূর্ণ HTML document দিন; html ও body tag থাকতে হবে।');
+  if (Utilities.newBlob(html).getBytes().length > 2 * 1024 * 1024) throw new Error('HTML ফাইল সর্বোচ্চ 2 MB হতে পারবে।');
+  const values = getSheet_().getDataRange().getValues();
+  const row = values.slice(1).find(r => String(r[0]) === String(id));
+  if (!row) throw new Error('পেজ পাওয়া যায়নি।');
+  const path = pageGithubPath_(row);
+  githubPutFile_(path, injectSharedShell_(html), 'Edit HTML source: ' + path);
+  return {ok:true, path:path, message:'HTML GitHub-এ আপডেট হয়েছে।'};
+}
+
 function getIndexHtml_(token) {
   requireAdmin_(token);
   const file = githubRequest_('get', 'index.html');
