@@ -18,17 +18,20 @@
 .app-dialog-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}.app-dialog-icon{width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:#e7f1ff;color:#0878ff;font-size:19px;font-weight:900}.app-dialog h3{font-size:17px;margin:0}.app-dialog-message{font-size:13px;line-height:1.55;color:var(--muted,#49638e);white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 18px}.app-dialog-actions{display:flex;justify-content:flex-end;gap:8px}.app-dialog-actions button{min-width:90px;padding:9px 14px}.app-dialog-actions .dialog-cancel{background:#f5f8fd;border:1px solid #cbdcf1;color:#1b315d}.app-dialog-actions .dialog-ok{background:var(--blue,#0878ff);color:#fff}@keyframes dialogIn{from{opacity:0;transform:translateY(5px) scale(.985)}to{opacity:1;transform:none}}
 
 </style>
+
+<link rel="stylesheet" href="https://eservicebd24.github.io/common.css">
 </head>
- 
 <body>
+<!-- eServiceBD24 shared site header: managed centrally by header.html/common.js -->
+<header id="esbd-shared-header" class="esbd-shell-placeholder"><a href="https://eservicebd24.github.io/">☁ eServiceBD24</a> · <a href="https://eservicebd24.github.io/all-services.html">All Tools</a></header>
 <div class="wrap">
 <header class="top">
-  <div class="brand"><div class="logo">▤M3U</div><div><h1>M3U Playlist Studio</h1><small>Create · Edit · Organize · Export M3U/M3U8 Playlist</small></div></div>
- 
+  <nav class="nav" aria-label="Main navigation">
+    <button class="n-list" data-scroll="playlistTable">☷ Playlist</button><button class="n-tools" data-scroll="channelForm">✎ Editor</button><button class="n-categories" data-scroll="categoryManager">◆ Categories</button><button class="n-export" data-scroll="exportPanel">⇩ Export</button><button class="n-settings" id="settingsBtn">⚙ Settings</button><button class="n-about" id="aboutBtn">ⓘ About</button>
+  </nav><div class="header-actions"><button class="danger" id="clearBtn">▤ Clear playlist</button></div>
+</header>
 
- </header>
-   <nav class="nav" aria-label="Main navigation">
-    
+<div class="grid" id="workspace">
 <main class="left">
   <section class="panel">
     <div class="section-title"><span class="section-icon">▤</span><h2>Open / Import Playlist</h2></div>
@@ -118,8 +121,11 @@
 </div>
 
 
-<footer class="footer"><span>👥 <b>Developer / Team</b> &nbsp; SC Android Studio</span><span>✉ &nbsp; <b>Email</b> &nbsp; jakareachakladar@gmail.com</span><span>☎ &nbsp; <b>Contact</b> &nbsp; +8801303-072964</span><span>© SC Android Studio — All Rights Reserved.</span><button class="soft" id="footerAboutBtn">ⓘ About</button></footer>
+<button class="hidden" id="footerAboutBtn" type="button" aria-hidden="true" tabindex="-1">About</button>
 </div>
+
+<!-- eServiceBD24 shared site footer: managed centrally by footer.html/common.js -->
+<footer id="esbd-shared-footer" class="esbd-shell-placeholder">© 2026 eServiceBD24 · <a href="https://eservicebd24.github.io/privacy.html">Privacy Policy</a></footer>
 
 <div class="modal" id="aboutModal" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
   <div class="modal-card">
@@ -326,5 +332,7 @@ function updatePreviewOnLoad(){render();}
 updatePreviewOnLoad();
 })();
 </script>
+
+<script src="https://eservicebd24.github.io/common.js" defer></script>
 </body>
 </html>
