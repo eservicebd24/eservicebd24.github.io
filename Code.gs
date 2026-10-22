@@ -46,7 +46,7 @@ function apiGet_(p) {
   const action = String(p.action || 'getPages');
   let result;
   try {
-    if (action === 'getPages') result = {ok:true, pages:getPages().map(function(x){ return {id:x.id,title:x.title,subtitle:x.subtitle,icon:x.icon,filename:x.filename,driveFileId:x.driveFileId,githubUrl:x.githubUrl,active:x.active,createdAt:x.createdAt,updatedAt:x.updatedAt}; })};
+    if (action === 'getPages') result = {ok:true, pages:getPages().map(function(x){ return {id:x.id,title:x.title,subtitle:x.subtitle,icon:x.icon,filename:x.filename,driveFileId:x.driveFileId,githubUrl:x.githubUrl,category:x.category,active:x.active,createdAt:x.createdAt,updatedAt:x.updatedAt}; })};
     else if (action === 'getSettings') result = {ok:true, settings:getSettings_()};
     else throw new Error('Unknown API action');
   } catch (err) { result = {ok:false,message:String(err && err.message || err)}; }
@@ -79,13 +79,20 @@ function setupProject() {
   let sheet = ss.getSheetByName(CONFIG.SHEET_NAME);
   if (!sheet) sheet = ss.insertSheet(CONFIG.SHEET_NAME);
   if (sheet.getLastRow() === 0) {
-    sheet.appendRow(['id','title','subtitle','icon','filename','driveFileId','active','createdAt','updatedAt','githubUrl']);
+    sheet.appendRow(['id','title','subtitle','icon','filename','driveFileId','active','createdAt','updatedAt','githubUrl','category']);
     sheet.setFrozenRows(1);
     sheet.getRange(1,1,1,10).setFontWeight('bold').setBackground('#dbeafe');
-  } else if (sheet.getLastColumn() < 10) { sheet.getRange(1,10).setValue('githubUrl'); }
+  } else {
+    if (sheet.getLastColumn() < 10) sheet.getRange(1,10).setValue('githubUrl');
+    if (sheet.getLastColumn() < 11) sheet.getRange(1,11).setValue('category');
+  }
   let settingsSheet = ss.getSheetByName(CONFIG.SETTINGS_SHEET);
   if (!settingsSheet) { settingsSheet = ss.insertSheet(CONFIG.SETTINGS_SHEET); settingsSheet.appendRow(['key','value']); settingsSheet.setFrozenRows(1); settingsSheet.getRange(1,1,1,2).setFontWeight('bold').setBackground('#dbeafe'); }
-  if (settingsSheet.getLastRow() < 2) { [['siteTitle','eServiceBD24'],['tagline','All Online Tools in One Place'],['heroEyebrow','✦ SMART • SIMPLE • FREE'],['heroTitle','All Online Tools in One Place'],['heroSubtitle','আপনার প্রয়োজনীয় সব অনলাইন সার্ভিস এক জায়গায়'],['popular','M3U Editor, M3U Maker, Age Calculator, Image Tools'],['footerText','© 2026 eServiceBD24. All Rights Reserved.'],['privacyUrl','https://eservicebd24.github.io/privacy.html'],['headerBrand','eServiceBD24'],['headerColor','#061b3d'],['footerColor','#061b3d']].forEach(r=>settingsSheet.appendRow(r)); }
+  if (settingsSheet.getLastRow() < 2) { [['siteTitle','eServiceBD24'],['tagline','All Online Tools in One Place'],['heroEyebrow','✦ SMART • SIMPLE • FREE'],['heroTitle','All Online Tools in One Place'],['heroSubtitle','আপনার প্রয়োজনীয় সব অনলাইন সার্ভিস এক জায়গায়'],['popular','M3U Editor, M3U Maker, Age Calculator, Image Tools'],['footerText','© 2026 eServiceBD24. All Rights Reserved.'],['privacyUrl','https://eservicebd24.github.io/privacy.html'],['headerBrand','eServiceBD24'],['headerColor','#061b3d'],['footerColor','#061b3d'],['aboutTitle','আমাদের সম্পর্কে'],['aboutText','eServiceBD24 — আপনার প্রয়োজনীয় অনলাইন টুলস এক জায়গায়।'],['contactTitle','যোগাযোগ'],['contactText','যোগাযোগের জন্য আমাদের ইমেইল করুন।'],['contactEmail','support@eservicebd24.com'],['headerMenu','Home,All Tools,About,Contact'],['footerMenu','Privacy Policy']].forEach(r=>settingsSheet.appendRow(r)); }
+  // Add newly introduced settings without overwriting values already managed by the admin.
+  const defaultSettings = [['aboutTitle','আমাদের সম্পর্কে'],['aboutText','eServiceBD24 — আপনার প্রয়োজনীয় অনলাইন টুলস এক জায়গায়।'],['contactTitle','যোগাযোগ'],['contactText','যোগাযোগের জন্য আমাদের ইমেইল করুন।'],['contactEmail','support@eservicebd24.com'],['headerMenu','Home,All Tools,About,Contact'],['footerMenu','Privacy Policy,Home']];
+  const existingKeys = new Set(settingsSheet.getDataRange().getValues().slice(1).map(r=>String(r[0]||'')));
+  defaultSettings.forEach(r=>{if(!existingKeys.has(r[0]))settingsSheet.appendRow(r)});
   // No HTML file is saved to Drive. The Pages and Settings sheets store metadata only;
   // uploaded HTML content is committed directly to GitHub by savePage().
   return {
@@ -109,7 +116,7 @@ function getPages() {
       // Kept only for legacy compatibility. New HTML uploads never use Drive.
       driveFileId: String(r[5] || ''), githubUrl: String(r[9] || ''),
       active: String(r[6]).toLowerCase() !== 'false',
-      createdAt: String(r[7] || ''), updatedAt: String(r[8] || '')
+      createdAt: String(r[7] || ''), updatedAt: String(r[8] || ''), category: String(r[10] || 'Other')
     };
     const key = p.filename ? p.filename.trim().toLowerCase() : 'id:' + p.id;
     const old = byFilename[key];
@@ -154,6 +161,10 @@ function savePage(data, token) {
   const subtitle = String(data.subtitle || '').trim().slice(0,250);
   const icon = String(data.icon || '✦').slice(0,12);
   const filename = String(data.filename || makeFilename_(title)).trim();
+  const category = String(data.category || 'Other').trim().slice(0,60);
+  if (!category) throw new Error('ক্যাটাগরি নির্বাচন করুন।');
+  const categorySlug = category.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'other';
+  const githubPath = categorySlug + '/' + filename;
   if (!/^[A-Za-z0-9._-]+\.html?$/i.test(filename) || /^(index|admin)\.html$/i.test(filename)) {
     throw new Error('ফাইলের নাম ইংরেজি অক্ষর/সংখ্যা দিয়ে .html হতে হবে; index.html/admin.html ব্যবহার করা যাবে না।');
   }
@@ -193,16 +204,16 @@ function savePage(data, token) {
     if (bytes.length > 2 * 1024 * 1024) throw new Error('HTML ফাইল সর্বোচ্চ 2 MB হতে পারবে।');
     const originalHtml = Utilities.newBlob(bytes).getDataAsString('UTF-8');
     const html = injectSharedShell_(originalHtml);
-    githubPutFile_(filename, html, 'Add/update service page: ' + filename);
+    githubPutFile_(githubPath, html, 'Add/update service page: ' + githubPath);
     const cfg = githubConfig_();
     const isUserSiteRepo = String(cfg.repo).toLowerCase() === (String(cfg.owner) + '.github.io').toLowerCase();
     const siteRoot = isUserSiteRepo ? ('https://' + cfg.repo) : ('https://' + cfg.owner + '.github.io/' + cfg.repo);
-    githubUrl = siteRoot.replace(/\/+$/, '') + '/' + filename;
+    githubUrl = siteRoot.replace(/\/+$/, '') + '/' + githubPath;
     // New HTML content is committed to GitHub only. This clears any legacy Drive ID
     // from the metadata row without creating a Drive file.
     fileId = '';
     if (oldGithubUrl && oldFilename && oldFilename.toLowerCase() !== filenameKey) {
-      try { githubDeleteFile_(oldFilename); } catch (err) {
+      try { githubDeleteFile_((String(rows[rowNum-1][10] || 'Other').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'other') + '/' + oldFilename); } catch (err) {
         // Keep the new page saved. An old path can be manually removed if the token
         // lacks permission; never roll back a successful upload.
       }
@@ -211,7 +222,7 @@ function savePage(data, token) {
 
   const now = new Date();
   const oldCreated = rowNum > 0 ? rows[rowNum-1][7] : now;
-  const record = [id,title,subtitle,icon,filename,fileId,data.active === false ? false : true,oldCreated,now,githubUrl];
+  const record = [id,title,subtitle,icon,filename,fileId,data.active === false ? false : true,oldCreated,now,githubUrl,category];
   if (rowNum > 0) sheet.getRange(rowNum,1,1,record.length).setValues([record]);
   else { sheet.appendRow(record); rowNum = sheet.getLastRow(); }
   // Clean existing rows that pointed to the same GitHub path, keeping the row just saved.
@@ -265,7 +276,10 @@ function deletePage(id, token) {
   const filename = String(target[4] || '');
   const fileId = String(target[5] || '');
   const githubUrl = String(target[9] || '');
-  if (githubUrl && filename) githubDeleteFile_(filename);
+  if (githubUrl && filename) {
+    const cat = String(target[10] || 'Other').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'other';
+    githubDeleteFile_(cat + '/' + filename);
+  }
   // Remove the selected row and any old duplicate metadata rows for this same path.
   const key = filename.trim().toLowerCase();
   const current = sheet.getDataRange().getValues();
@@ -355,7 +369,7 @@ function githubRequest_(method, path, body) {
   return data;
 }
 function githubPutFile_(filename, html, message) {
-  const c = githubConfig_(), path = encodeURIComponent(filename).replace(/%2F/gi,'/');
+  const c = githubConfig_(), path = String(filename).split('/').map(encodeURIComponent).join('/');
   let sha = '';
   try { sha = githubRequest_('get', path).sha || ''; } catch (e) { if (!/Not Found/i.test(String(e.message))) throw e; }
   const content = Utilities.base64Encode(Utilities.newBlob(html, 'text/html; charset=utf-8').getBytes());
@@ -363,7 +377,7 @@ function githubPutFile_(filename, html, message) {
   return githubRequest_('put', path, body);
 }
 function githubDeleteFile_(filename) {
-  const c = githubConfig_(), path = encodeURIComponent(filename).replace(/%2F/gi,'/');
+  const c = githubConfig_(), path = String(filename).split('/').map(encodeURIComponent).join('/');
   const file = githubRequest_('get', path);
   return githubRequest_('delete', path, {message:'Delete service page: '+filename,sha:file.sha,branch:c.branch});
 }
