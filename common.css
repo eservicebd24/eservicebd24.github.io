@@ -1,2 +1,12 @@
 #esbd-shared-header{background:linear-gradient(100deg,#041632,#062e70 65%,#172bc0);color:#fff;padding:12px max(16px,calc((100% - 1350px)/2));display:flex;align-items:center;justify-content:space-between;gap:16px;position:sticky;top:0;z-index:9999;font-family:Arial,"Noto Sans Bengali",sans-serif}#esbd-shared-header a{color:inherit;text-decoration:none}#esbd-shared-header .brand{display:flex;align-items:center;gap:12px;font-size:22px;font-weight:900}#esbd-shared-header .logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#00d9ff,#0875ff);display:grid;place-items:center;font-size:24px}#esbd-shared-header small{display:block;font-size:11px;color:#c5d7f5;font-weight:500}#esbd-shared-header nav{display:flex;gap:18px;align-items:center;font-size:13px;font-weight:bold}#esbd-shared-footer{background:linear-gradient(105deg,#03152f,#061f49);color:#d8e5fa;padding:14px max(18px,calc((100% - 1350px)/2));font-family:Arial,"Noto Sans Bengali",sans-serif}#esbd-shared-footer .copyright{border-top:1px solid #ffffff25;padding-top:8px;font-size:12px;display:flex;justify-content:space-between;gap:12px}#esbd-shared-footer a{color:inherit;text-decoration:none}@media(max-width:620px){#esbd-shared-header{padding:10px 12px}#esbd-shared-header .brand{font-size:17px}#esbd-shared-header .logo{width:38px;height:38px}#esbd-shared-header nav{gap:8px;font-size:11px}#esbd-shared-header nav a{display:none}#esbd-shared-header nav a:first-child,#esbd-shared-header nav a:nth-child(2){display:inline}#esbd-shared-footer .copyright{flex-direction:column}}
 html,body{min-height:100%;}body{min-height:100vh;display:flex;flex-direction:column;}body>main,body>.page-content,body>.content,body>#app{flex:1 0 auto;}body>footer,#esbd-shared-footer{margin-top:auto;flex-shrink:0;}#esbd-shared-header{flex-shrink:0;}
+
+/* Shared shell single-instance and sticky-footer layout */
+html{min-height:100%;height:100%}
+body{min-height:100vh;display:flex;flex-direction:column}
+body>#esbd-shared-header{order:0;flex:0 0 auto}
+body>#esbd-shared-footer{order:999;flex:0 0 auto;margin-top:auto}
+body>main,body>.wrap,body>.hero,body>.section,body>section,body>#app{flex:1 0 auto}
+#esbd-shared-header{position:relative;z-index:20}
+#esbd-shared-header nav a{white-space:nowrap}
+@media(max-width:620px){#esbd-shared-header nav a{display:inline;font-size:10px}}

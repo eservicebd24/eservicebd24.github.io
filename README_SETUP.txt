@@ -11,3 +11,10 @@ Files in this package are intended for the root of https://github.com/eservicebd
 The sidebar Header, Footer, About, Contact, Privacy and All Services Page options open the corresponding HTML source from GitHub in the editor. Save commits the file to GitHub. Header/footer are loaded by common.js across customer pages; common.css keeps the footer at the bottom on short pages. Header navigation text is All Services.
 
 Important: Deploy the Apps Script update as a new version; otherwise new getStaticHtml/saveStaticHtml actions will not be available. This package has not been tested against your live repository or Apps Script deployment. Verify the repo owner/name and API URL in admin.html/common.js before publishing.
+
+
+PATCH: shared-shell single-header fix
+- common.js now removes legacy header/footer elements before inserting header.html/footer.html, preventing duplicate navigation.
+- common.css includes shared sticky-footer layout rules.
+- Keep exactly one common.js include per page; do not manually include a second copy.
+- Header navigation labels/URLs are controlled by header.html. The visible label must be 'All Services'.
