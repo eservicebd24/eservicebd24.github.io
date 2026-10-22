@@ -1,17 +1,13 @@
-eServiceBD24 Admin CMS Update
+eServiceBD24 Admin CMS — HTML Editor Update
 
-Included: Code.gs, admin.html, admin/index.html, index.html, header.html, footer.html, common.js, common.css, about.html, contact.html, all-services.html.
+Files in this package are intended for the root of https://github.com/eservicebd24/eservicebd24.github.io (or the repository currently connected to the Apps Script backend).
 
-Important setup:
-1. Backup the current Apps Script Code.gs and Google Sheet.
-2. Replace Code.gs with this package Code.gs and Save.
-3. Apps Script > Deploy > Manage deployments > Edit > New version > Deploy.
-4. Replace GitHub repository admin.html, admin/index.html, index.html and shared assets as appropriate. Ensure the repository path for the Admin URL /admin/ contains admin/index.html.
-5. Script Properties must include GITHUB_TOKEN, GITHUB_OWNER=eservicebd24, GITHUB_REPO=eservicebd24.github.io, GITHUB_BRANCH=main, and existing SPREADSHEET_ID. Never put the token in HTML.
-6. Test login, save page, HTML Edit, View and Delete using a test page before production.
+1. Upload/replace admin.html and admin/index.html.
+2. Upload/replace Code.gs in Google Apps Script, save, then Deploy > Manage deployments > Edit > New version > Deploy.
+3. Upload/replace common.js and common.css, index.html, header.html, footer.html, about.html, contact.html, all-services.html. Add privacy.html if it is not already present.
+4. Keep the GitHub token only in Apps Script Script Properties. Never put it in the HTML.
+5. Open https://eservicebd24.github.io/admin/ and log in.
 
-Features in this update: removed default credentials hint, password show/hide, visible login progress, persistent browser login token (localStorage), sidebar logout, page details edit, HTML source edit, view and delete confirmation, shared settings anchors. HTML source edit requires the new Code.gs to be deployed.
+The sidebar Header, Footer, About, Contact, Privacy and All Services Page options open the corresponding HTML source from GitHub in the editor. Save commits the file to GitHub. Header/footer are loaded by common.js across customer pages; common.css keeps the footer at the bottom on short pages. Header navigation text is All Services.
 
-Security note: localStorage keeps the admin token in this browser until logout or token expiry; use only on a trusted device. For shared devices, log out.
-
-Not live-tested against the user's GitHub/Apps Script account.
+Important: Deploy the Apps Script update as a new version; otherwise new getStaticHtml/saveStaticHtml actions will not be available. This package has not been tested against your live repository or Apps Script deployment. Verify the repo owner/name and API URL in admin.html/common.js before publishing.

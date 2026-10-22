@@ -35,6 +35,8 @@ function doPost(e) {
       case 'getIndexHtml': result = getIndexHtml_(data.token); break;
       case 'getPageHtml': result = getPageHtml_(data.id, data.token); break;
       case 'savePageHtml': result = savePageHtml_(data.id, data.html, data.token); break;
+      case 'getStaticHtml': result = getStaticHtml_(data.path, data.token); break;
+      case 'saveStaticHtml': result = saveStaticHtml_(data.path, data.html, data.token); break;
       case 'saveIndexHtml': result = saveIndexHtml_(data.html, data.token); break;
       case 'deletePage': result = deletePage(data.id, data.token); break;
       case 'togglePage': result = togglePage(data.id, data.active, data.token); break;
@@ -458,4 +460,24 @@ function saveSettings(settings, token) {
     if (rows[k]) sh.getRange(rows[k],2).setValue(v); else sh.appendRow([k,v]);
   });
   return {ok:true,settings:getSettings_()};
+}
+
+function staticHtmlPath_(path) {
+  path = String(path || '').trim();
+  const allowed = ['header.html','footer.html','about.html','contact.html','privacy.html','all-services.html'];
+  if (allowed.indexOf(path) < 0) throw new Error('এই পেজটি এডিট করার অনুমতি নেই।');
+  return path;
+}
+function getStaticHtml_(path, token) {
+  requireAdmin_(token); path = staticHtmlPath_(path);
+  const file = githubRequest_('get', path);
+  const bytes = Utilities.base64Decode(String(file.content || '').replace(/\s/g,''));
+  return {ok:true, html:Utilities.newBlob(bytes).getDataAsString('UTF-8'), path:path};
+}
+function saveStaticHtml_(path, html, token) {
+  requireAdmin_(token); path = staticHtmlPath_(path); html = String(html || '');
+  if (!/<html[\s>]/i.test(html) || !/<body[\s>]/i.test(html)) throw new Error('সম্পূর্ণ HTML document দিন; html ও body tag থাকতে হবে।');
+  if (Utilities.newBlob(html).getBytes().length > 2 * 1024 * 1024) throw new Error('HTML ফাইল সর্বোচ্চ 2 MB হতে পারবে।');
+  githubPutFile_(path, html, 'Edit site page: ' + path);
+  return {ok:true, path:path, message:path+' GitHub-এ আপডেট হয়েছে।'};
 }
