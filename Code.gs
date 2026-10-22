@@ -413,7 +413,8 @@ function getPageHtml_(id, token) {
 function savePageHtml_(id, html, token) {
   requireAdmin_(token);
   html = String(html || '');
-  if (!/<html[\s>]/i.test(html) || !/<body[\s>]/i.test(html)) throw new Error('সম্পূর্ণ HTML document দিন; html ও body tag থাকতে হবে।');
+  if (path !== 'header.html' && path !== 'footer.html' && (!/<html[\s>]/i.test(html) || !/<body[\s>]/i.test(html))) throw new Error('সম্পূর্ণ HTML document দিন; html ও body tag থাকতে হবে।');
+  if ((path === 'header.html' && !/<header[\s>]/i.test(html)) || (path === 'footer.html' && !/<footer[\s>]/i.test(html))) throw new Error('Header ফাইলে <header> এবং Footer ফাইলে <footer> element থাকতে হবে।');
   if (Utilities.newBlob(html).getBytes().length > 2 * 1024 * 1024) throw new Error('HTML ফাইল সর্বোচ্চ 2 MB হতে পারবে।');
   const values = getSheet_().getDataRange().getValues();
   const row = values.slice(1).find(r => String(r[0]) === String(id));
@@ -476,7 +477,8 @@ function getStaticHtml_(path, token) {
 }
 function saveStaticHtml_(path, html, token) {
   requireAdmin_(token); path = staticHtmlPath_(path); html = String(html || '');
-  if (!/<html[\s>]/i.test(html) || !/<body[\s>]/i.test(html)) throw new Error('সম্পূর্ণ HTML document দিন; html ও body tag থাকতে হবে।');
+  if (path !== 'header.html' && path !== 'footer.html' && (!/<html[\s>]/i.test(html) || !/<body[\s>]/i.test(html))) throw new Error('সম্পূর্ণ HTML document দিন; html ও body tag থাকতে হবে।');
+  if ((path === 'header.html' && !/<header[\s>]/i.test(html)) || (path === 'footer.html' && !/<footer[\s>]/i.test(html))) throw new Error('Header ফাইলে <header> এবং Footer ফাইলে <footer> element থাকতে হবে।');
   if (Utilities.newBlob(html).getBytes().length > 2 * 1024 * 1024) throw new Error('HTML ফাইল সর্বোচ্চ 2 MB হতে পারবে।');
   githubPutFile_(path, html, 'Edit site page: ' + path);
   return {ok:true, path:path, message:path+' GitHub-এ আপডেট হয়েছে।'};

@@ -1,20 +1,19 @@
-eServiceBD24 Admin CMS — HTML Editor Update
+eServiceBD24 CMS - corrected build
 
-Files in this package are intended for the root of https://github.com/eservicebd24/eservicebd24.github.io (or the repository currently connected to the Apps Script backend).
+Files included:
+- Code.gs (Google Apps Script backend; updated static header/footer snippet validation)
+- admin.html and admin/index.html (Admin Panel with Visual Editors + optional Advanced HTML Editor)
+- index.html, all-services.html, about.html, contact.html, privacy.html
+- header.html, footer.html, common.css, common.js
 
-1. Upload/replace admin.html and admin/index.html.
-2. Upload/replace Code.gs in Google Apps Script, save, then Deploy > Manage deployments > Edit > New version > Deploy.
-3. Upload/replace common.js and common.css, index.html, header.html, footer.html, about.html, contact.html, all-services.html. Add privacy.html if it is not already present.
-4. Keep the GitHub token only in Apps Script Script Properties. Never put it in the HTML.
-5. Open https://eservicebd24.github.io/admin/ and log in.
+INSTALL:
+1. Back up the current GitHub repository and Apps Script project.
+2. Replace Code.gs in Apps Script with this package's Code.gs, save, then Deploy > Manage deployments > Edit > New version > Deploy.
+3. Upload/replace the website files at the repository root. Keep admin/index.html synced with admin.html.
+4. Open https://eservicebd24.github.io/admin/ and sign in.
+5. Use Header Editor / Footer Editor / About / Contact / Privacy for visual settings. Advanced HTML Editor is optional.
 
-The sidebar Header, Footer, About, Contact, Privacy and All Services Page options open the corresponding HTML source from GitHub in the editor. Save commits the file to GitHub. Header/footer are loaded by common.js across customer pages; common.css keeps the footer at the bottom on short pages. Header navigation text is All Services.
-
-Important: Deploy the Apps Script update as a new version; otherwise new getStaticHtml/saveStaticHtml actions will not be available. This package has not been tested against your live repository or Apps Script deployment. Verify the repo owner/name and API URL in admin.html/common.js before publishing.
-
-
-PATCH: shared-shell single-header fix
-- common.js now removes legacy header/footer elements before inserting header.html/footer.html, preventing duplicate navigation.
-- common.css includes shared sticky-footer layout rules.
-- Keep exactly one common.js include per page; do not manually include a second copy.
-- Header navigation labels/URLs are controlled by header.html. The visible label must be 'All Services'.
+Important:
+- Apps Script must already have the correct GitHub token and spreadsheet ID in Script Properties.
+- The package has not been tested against the user's live Apps Script, Sheet, or GitHub repository. Test after deployment.
+- Service-page paths continue to use the existing category-slug behavior in Code.gs.
