@@ -280,8 +280,7 @@ function deletePage(id, token) {
   const fileId = String(target[5] || '');
   const githubUrl = String(target[9] || '');
   if (githubUrl && filename) {
-    const cat = String(target[10] || 'Other').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'other';
-    githubDeleteFile_(cat + '/' + filename);
+    githubDeleteFile_('all-services/' + filename);
   }
   // Remove the selected row and any old duplicate metadata rows for this same path.
   const key = filename.trim().toLowerCase();
@@ -396,8 +395,7 @@ function injectSharedShell_(html) {
 }
 
 function pageGithubPath_(row) {
-  const category = String(row[10] || 'Other').trim().toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'other';
-  return category + '/' + String(row[4] || '').trim();
+  return 'all-services/' + String(row[4] || '').trim();
 }
 function getPageHtml_(id, token) {
   requireAdmin_(token);
