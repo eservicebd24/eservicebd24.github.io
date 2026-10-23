@@ -67,50 +67,35 @@ function closeModal(){document.getElementById('modalback').style.display='none'}
 function editPage(id){const p=pages.find(x=>String(x.id)===String(id));if(!p){notify('error','পেজ পাওয়া যায়নি','Refresh List করে আবার চেষ্টা করুন।',false);return;}reset();document.getElementById('id').value=p.id;document.getElementById('title').value=p.title;document.getElementById('subtitle').value=p.subtitle;document.getElementById('filename').value=p.filename;document.getElementById('category').value='all-services';document.getElementById('activeCheck').checked=p.active;setIcon(p.icon);document.getElementById('modalTitle').textContent='✎ Edit Page';document.getElementById('fileInfo').textContent=(p.githubUrl||p.driveFileId)?'আগের HTML ফাইল আছে। নতুন ফাইল দিলে বদলে যাবে।':'এখনও HTML ফাইল আপলোড করা হয়নি।';document.getElementById('modalback').style.display='flex'}
 function readFile(input){const f=input.files&&input.files[0];if(!f)return;if(!/\.html?$/i.test(f.name)){notify('warning','ভুল ফাইল','শুধু .html বা .htm ফাইল নির্বাচন করুন।');input.value='';return}if(f.size>2*1024*1024){notify('warning','ফাইল বড়','HTML ফাইল 2 MB-এর কম হতে হবে।');input.value='';return}const reader=new FileReader();reader.onload=()=>{fileBase64=String(reader.result).split(',')[1]||'';fileOriginalName=f.name;document.getElementById('fileInfo').textContent=f.name+' ('+Math.ceil(f.size/1024)+' KB) নির্বাচিত';if(!document.getElementById('filename').value)document.getElementById('filename').value=f.name;notify('success','ফাইল প্রস্তুত',f.name+' আপলোডের জন্য প্রস্তুত।')};reader.onerror=()=>notify('error','ফাইল পড়া যায়নি','ফাইলটি আবার নির্বাচন করুন।');reader.readAsDataURL(f)}function setAddPageProgress(title,message,show=true){const box=document.getElementById('addPageProgress');if(!box)return;box.style.display=show?'block':'none';if(title)document.getElementById('addPageProgressTitle').textContent=title;if(message)document.getElementById('addPageProgressText').textContent=message}
 async function injectSharedShell(html){
-  if(!html) return html;
+  if(!html) throw new Error('আপলোড করা HTML ফাইলটি খালি।');
   const ROOT='https://eservicebd24.github.io/';
-  // Fetch the current canonical snippets at save-time so the saved GitHub HTML
-  // contains the actual default header/footer, not just a runtime loader.
-  let headerResponse,footerResponse;
-  try {
-    [headerResponse,footerResponse]=await Promise.all([
-      fetch(ROOT+'header.html?admin-shell='+Date.now(),{cache:'no-store'}),
-      fetch(ROOT+'footer.html?admin-shell='+Date.now(),{cache:'no-store'})
-    ]);
-  } catch(fetchErr) { throw new Error('GitHub Pages থেকে header.html/footer.html লোড করা যায়নি। নেটওয়ার্ক, URL এবং GitHub Pages প্রকাশনা যাচাই করুন। বিস্তারিত: '+(fetchErr&&fetchErr.message||'fetch failed')); }
-  if(!headerResponse.ok) throw new Error('header.html লোড হয়নি (HTTP '+headerResponse.status+'). URL: '+ROOT+'header.html');
-  if(!footerResponse.ok) throw new Error('footer.html লোড হয়নি (HTTP '+footerResponse.status+'). URL: '+ROOT+'footer.html');
-  const [headerText,footerText]=await Promise.all([headerResponse.text(),footerResponse.text()]);
-  const parseSnippet=(source,id,tag)=>{
-    const doc=new DOMParser().parseFromString(source,'text/html');
-    return doc.getElementById(id)||doc.querySelector(tag);
-  };
-  const headerNode=parseSnippet(headerText,'esbd-shared-header','header');
-  const footerNode=parseSnippet(footerText,'esbd-shared-footer','footer');
-  if(!headerNode||!footerNode) throw new Error('header.html অথবা footer.html-এ প্রয়োজনীয় header/footer পাওয়া যায়নি।');
-  const header=headerNode.outerHTML, footer=footerNode.outerHTML;
   const doc=new DOMParser().parseFromString(html,'text/html');
-  // Always refresh existing shared shell elements with the latest canonical files.
-  const oldHeader=doc.getElementById('esbd-shared-header');
-  const oldFooter=doc.getElementById('esbd-shared-footer');
-  if(oldHeader) oldHeader.outerHTML=header;
-  else {
-    const genericHeader=[...doc.querySelectorAll('header')].find(el=>!el.closest('main,article,section'));
-    if(genericHeader) genericHeader.outerHTML=header;
-    else doc.body.insertAdjacentHTML('afterbegin',header);
-  }
-  if(oldFooter) oldFooter.outerHTML=footer;
-  else {
-    const genericFooter=[...doc.querySelectorAll('footer')].find(el=>!el.closest('main,article,section'));
-    if(genericFooter) genericFooter.outerHTML=footer;
-    else doc.body.insertAdjacentHTML('beforeend',footer);
-  }
-  // Ensure the shared stylesheet/settings script are present exactly once.
-  if(!doc.querySelector('link[href*="/common.css"]')){
+  if(!doc.documentElement) throw new Error('HTML ফাইলটি সঠিকভাবে পড়া যায়নি।');
+  // Remove old shared-shell elements/slots and replace with stable loader slots.
+  doc.querySelectorAll('#esbd-shared-header,#esbd-shared-footer,#esbd-header-slot,#esbd-footer-slot').forEach(el=>el.remove());
+  // Remove only global header/footer elements, not header/footer used inside app panels.
+  const oldHeader=[...doc.querySelectorAll('header')].find(el=>!el.closest('main,article,section,nav,aside'));
+  const oldFooter=[...doc.querySelectorAll('footer')].find(el=>!el.closest('main,article,section,nav,aside'));
+  if(oldHeader) oldHeader.remove();
+  if(oldFooter) oldFooter.remove();
+  // Ensure common stylesheet exists once.
+  doc.querySelectorAll('link[href*="common.css"]').forEach((el,i)=>{if(i>0)el.remove()});
+  if(!doc.querySelector('link[href*="common.css"]')){
     const link=doc.createElement('link');link.rel='stylesheet';link.href=ROOT+'common.css';doc.head.appendChild(link);
   }
-  if(!doc.querySelector('script[src*="/common.js"]')){
-    const script=doc.createElement('script');script.src=ROOT+'common.js';script.defer=true;doc.head.appendChild(script);
+  // Shared loader is the only per-page shell code. Header/footer markup stays in central files.
+  doc.querySelectorAll('script[src*="shared-shell-loader.js"]').forEach((el,i)=>{if(i>0)el.remove()});
+  if(!doc.querySelector('script[src*="shared-shell-loader.js"]')){
+    const script=doc.createElement('script');script.src=ROOT+'shared-shell-loader.js';script.defer=true;doc.body.appendChild(script);
+  }
+  const headerSlot=doc.createElement('div');headerSlot.id='esbd-header-slot';
+  const footerSlot=doc.createElement('div');footerSlot.id='esbd-footer-slot';
+  // Place slots around page content, after any body-level scripts/styles at the beginning.
+  doc.body.insertBefore(headerSlot,doc.body.firstChild);
+  doc.body.appendChild(footerSlot);
+  // Keep existing common.js (used for site-wide settings) if present; add if absent.
+  if(!doc.querySelector('script[src*="common.js"]')){
+    const common=doc.createElement('script');common.src=ROOT+'common.js';common.defer=true;doc.body.appendChild(common);
   }
   return '<!doctype html>\n'+doc.documentElement.outerHTML;
 }
@@ -131,7 +116,7 @@ async function save(e){
        showBusy('ডিফল্ট Header/Footer লোড হচ্ছে','ধাপ ২/৩: header.html ও footer.html লোড হচ্ছে…');
        const patched=await injectSharedShell(original);
        data.htmlBase64=btoa(Array.from(new TextEncoder().encode(patched),b=>String.fromCharCode(b)).join(''));
-       setAddPageProgress('ধাপ ২/৩ — সম্পন্ন','Header/Footer এবং common.css/common.js HTML-এ প্রস্তুত হয়েছে।',true);
+       setAddPageProgress('ধাপ ২/৩ — সম্পন্ন','Shared Header/Footer Loader এবং common.css/common.js যুক্ত হয়েছে।',true);
      } else {
        setAddPageProgress('Header/Footer বাদ দেওয়া হয়েছে','চেকবক্স বন্ধ থাকায় ডিফল্ট Header/Footer যোগ করা হবে না।',true);
      }
