@@ -64,14 +64,40 @@ function closeModal(){document.getElementById('modalback').style.display='none'}
 function editPage(id){const p=pages.find(x=>String(x.id)===String(id));if(!p){notify('error','পেজ পাওয়া যায়নি','Refresh List করে আবার চেষ্টা করুন।',false);return;}reset();document.getElementById('id').value=p.id;document.getElementById('title').value=p.title;document.getElementById('subtitle').value=p.subtitle;document.getElementById('filename').value=p.filename;document.getElementById('category').value='all-services';document.getElementById('activeCheck').checked=p.active;setIcon(p.icon);document.getElementById('modalTitle').textContent='✎ Edit Page';document.getElementById('fileInfo').textContent=(p.githubUrl||p.driveFileId)?'আগের HTML ফাইল আছে। নতুন ফাইল দিলে বদলে যাবে।':'এখনও HTML ফাইল আপলোড করা হয়নি।';document.getElementById('modalback').style.display='flex'}
 function readFile(input){const f=input.files&&input.files[0];if(!f)return;if(!/\.html?$/i.test(f.name)){notify('warning','ভুল ফাইল','শুধু .html বা .htm ফাইল নির্বাচন করুন।');input.value='';return}if(f.size>2*1024*1024){notify('warning','ফাইল বড়','HTML ফাইল 2 MB-এর কম হতে হবে।');input.value='';return}const reader=new FileReader();reader.onload=()=>{fileBase64=String(reader.result).split(',')[1]||'';fileOriginalName=f.name;document.getElementById('fileInfo').textContent=f.name+' ('+Math.ceil(f.size/1024)+' KB) নির্বাচিত';if(!document.getElementById('filename').value)document.getElementById('filename').value=f.name;notify('success','ফাইল প্রস্তুত',f.name+' আপলোডের জন্য প্রস্তুত।')};reader.onerror=()=>notify('error','ফাইল পড়া যায়নি','ফাইলটি আবার নির্বাচন করুন।');reader.readAsDataURL(f)}function injectSharedShell(html){
   const marker='esbd24-shared-shell-loader';
-  if(!html || html.includes(marker)) return html;
+  if(!html) return html;
+  // Avoid adding the loader twice, but keep old versions replaceable if they used the same marker.
+  if(html.includes(marker)) return html;
   const loader=`<script id="${marker}">
 (async()=>{
  const ROOT='https://eservicebd24.github.io/';
- const load=async(path)=>{const r=await fetch(ROOT+path,{cache:'no-cache'});if(!r.ok)throw new Error(path+' load failed');return await r.text()};
- const addStyle=()=>{if(document.getElementById('esbd24-shell-style'))return;const s=document.createElement('style');s.id='esbd24-shell-style';s.textContent='#esbd24-shared-header,#esbd24-shared-footer{width:100%;display:block;position:relative;z-index:5}#esbd24-shared-header img,#esbd24-shared-footer img{max-width:100%}';document.head.appendChild(s)};
- const mount=async(path,id,where)=>{try{const html=await load(path);const wrap=document.createElement('div');wrap.id=id;wrap.innerHTML=html;const target=wrap.querySelector('header,footer,nav,main,body')||wrap;const node=target===wrap?wrap:target; if(where==='top')document.body.insertBefore(node,document.body.firstChild);else document.body.appendChild(node);}catch(e){console.warn('[eServiceBD24 shared shell]',path,e)}};
- const run=async()=>{if(!document.body)return;addStyle();if(!document.getElementById('esbd24-shared-header')){const r=await fetch(ROOT+'header.html',{cache:'no-cache'});if(r.ok){const t=document.createElement('template');t.innerHTML=await r.text();const w=document.createElement('div');w.id='esbd24-shared-header';w.append(...t.content.childNodes);document.body.insertBefore(w,document.body.firstChild)}}if(!document.getElementById('esbd24-shared-footer')){const r=await fetch(ROOT+'footer.html',{cache:'no-cache'});if(r.ok){const t=document.createElement('template');t.innerHTML=await r.text();const w=document.createElement('div');w.id='esbd24-shared-footer';w.append(...t.content.childNodes);document.body.appendChild(w)}}};
+ const loadSharedPart=async(path,id,selector,position)=>{
+   try{
+     const response=await fetch(ROOT+path,{cache:'no-cache'});
+     if(!response.ok)throw new Error(path+' returned '+response.status);
+     const markup=await response.text();
+     const template=document.createElement('template');template.innerHTML=markup.trim();
+     let fresh=template.content.querySelector('#'+id)||template.content.querySelector(selector);
+     if(!fresh)throw new Error('Could not find '+id+' in '+path);
+     fresh=fresh.cloneNode(true);fresh.id=id;
+     // Replace the current shared element when present; otherwise insert the shared one.
+     let old=document.getElementById(id);
+     if(!old){
+       const candidates=[...document.querySelectorAll(selector)];
+       old=candidates.find(el=>el.closest('main,article')===null)||null;
+     }
+     if(old){old.replaceWith(fresh)}
+     else if(position==='top')document.body.insertBefore(fresh,document.body.firstChild);
+     else document.body.appendChild(fresh);
+   }catch(error){console.error('[eServiceBD24 shared shell]',error)}
+ };
+ const run=async()=>{
+   if(!document.body)return;
+   await loadSharedPart('header.html','esbd-shared-header','#esbd-shared-header,header','top');
+   await loadSharedPart('footer.html','esbd-shared-footer','#esbd-shared-footer,footer','bottom');
+   if(!document.querySelector('script[src*="common.js"]')){
+     const script=document.createElement('script');script.src=ROOT+'common.js';script.defer=true;document.body.appendChild(script);
+   }
+ };
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
 })();
 <\/script>`;
