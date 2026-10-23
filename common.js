@@ -1,1 +1,49 @@
-(()=>{'use strict';const ROOT='https://eservicebd24.github.io/',API='https://script.google.com/macros/s/AKfycbySP1uhavqH3VwJDdDq6i0xDtdVA_CJRERaGTZheM0BwMBX_ttnrFK_8Zc5_qa2gHk9pA/exec';const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));async function shell(){try{const [a,b]=await Promise.all([fetch(ROOT+'header.html?'+Date.now()),fetch(ROOT+'footer.html?'+Date.now())]);if(!a.ok||!b.ok)throw 0;const h=await a.text(),f=await b.text();let oh=document.querySelector('body>header')||document.querySelector('header'),of=document.querySelector('body>footer')||document.querySelector('footer');if(oh)oh.outerHTML=h;else document.body.insertAdjacentHTML('afterbegin',h);if(of)of.outerHTML=f;else document.body.insertAdjacentHTML('beforeend',f)}catch(e){if(!document.getElementById('esbd-shared-header'))document.body.insertAdjacentHTML('afterbegin','<header id="esbd-shared-header"><a href="'+ROOT+'">☁ eServiceBD24</a> · <a href="'+ROOT+'all-services.html">All Services</a></header>');if(!document.getElementById('esbd-shared-footer'))document.body.insertAdjacentHTML('beforeend','<footer id="esbd-shared-footer">© 2026 eServiceBD24</footer>')}settings()}function settings(){let cb='esbdShell'+Date.now();window[cb]=r=>{delete window[cb];let s=r&&r.settings||{},h=document.getElementById('esbd-shared-header'),f=document.getElementById('esbd-shared-footer');if(!h||!f)return;if(s.headerBrand){let b=h.querySelector('.brandtext');if(b)b.innerHTML=esc(s.headerBrand)+'<small>'+esc(s.tagline||'All Online Tools in One Place')+'</small>'}if(s.headerColor)h.style.background=s.headerColor;if(s.footerColor)f.style.background=s.footerColor;if(s.footerText){let t=f.querySelector('.esbd-footer-text');if(t)t.textContent=s.footerText}if(s.privacyUrl){let a=f.querySelector('.esbd-privacy-link');if(a)a.href=s.privacyUrl}if(s.headerMenuItems||s.headerMenu){let nav=h.querySelector('nav');if(nav){const routes={'Home':'','All Services':'all-services.html','All Tools':'all-services.html','Categories':'all-services.html','About':'about.html','Contact':'contact.html','Privacy Policy':'privacy.html'};let items=[];try{items=JSON.parse(s.headerMenuItems||'[]')}catch(_){}if(!Array.isArray(items)||!items.length)items=String(s.headerMenu||'Home,All Services,About,Contact').split(',').map(label=>({label:label.trim(),url:ROOT+(routes[label.trim()]===undefined?'all-services.html':routes[label.trim()])}));items=items.map(item=>({...item,label:(/^(all tools|categories|tools)$/i.test(String(item.label||'').trim()))?'All Services':String(item.label||'').trim()}));nav.innerHTML=items.filter(x=>x&&String(x.label||'').trim()&&String(x.url||'').trim()).map(item=>{let label=String(item.label).trim();if(/^(all tools|categories|tools)$/i.test(label))label='All Services';let url=String(item.url).trim();if(!/^https?:\/\//i.test(url))url=ROOT+url.replace(/^\//,'');return '<a href="'+esc(url)+'">'+esc(label)+'</a>'}).join('')}}if(s.footerMenu){let links=f.querySelector('.copyright span:last-child');if(links){const routes={'Home':'','All Services':'all-services.html','All Tools':'all-services.html','Categories':'all-services.html','About':'about.html','Contact':'contact.html','Privacy Policy':'privacy.html'};links.innerHTML=String(s.footerMenu).split(',').map(x=>x.trim()).filter(Boolean).map(label=>{if(label==='All Tools'||label==='Categories')label='All Services';return '<a href="'+ROOT+(routes[label]===undefined?'all-services.html':routes[label])+'">'+esc(label)+'</a>'}).join(' · ')}}};let sc=document.createElement('script');sc.src=API+'?api=1&action=getSettings&callback='+cb;document.head.appendChild(sc)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',shell);else shell()})();
+(()=>{'use strict';
+const ROOT='https://eservicebd24.github.io/',API='https://script.google.com/macros/s/AKfycbySP1uhavqH3VwJDdDq6i0xDtdVA_CJRERaGTZheM0BwMBX_ttnrFK_8Zc5_qa2gHk9pA/exec';
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function normalUrl(value,label){
+ let u=String(value||'').trim();
+ const routes={'Home':'','All Services':'all-services.html','All Tools':'all-services.html','Categories':'all-services.html','About':'about.html','Contact':'contact.html','Privacy Policy':'privacy.html'};
+ if(!u) return ROOT+(routes[label]===undefined?'all-services.html':routes[label]);
+ if(/^https?:\/\//i.test(u)){
+   // Normalize the legacy extensionless All Services URL without appending a second path.
+   try{const x=new URL(u);if(x.hostname==='eservicebd24.github.io' && /\/all-services\/?$/i.test(x.pathname))x.pathname='/all-services.html';return x.href}catch(e){return u}
+ }
+ u=u.replace(/^\/+/, '');
+ if(/^all-services\/?$/i.test(u))u='all-services.html';
+ return ROOT+u;
+}
+function applySettings(r){
+ const s=r&&r.settings||{},h=document.getElementById('esbd-shared-header'),f=document.getElementById('esbd-shared-footer');
+ if(!h||!f)return;
+ h.style.background='linear-gradient(100deg,#041632,#062e70 65%,#172bc0)';
+ h.style.color='#fff';
+ if(s.headerBrand){const b=h.querySelector('.brandtext');if(b)b.innerHTML=esc(s.headerBrand)+'<small>'+esc(s.tagline||'All Online Tools in One Place')+'</small>'}
+ if(s.footerColor)f.style.background=s.footerColor;
+ if(s.footerText){const t=f.querySelector('.esbd-footer-text');if(t)t.textContent=s.footerText}
+ if(s.privacyUrl){const a=f.querySelector('.esbd-privacy-link');if(a)a.href=normalUrl(s.privacyUrl,'Privacy Policy')}
+ const nav=h.querySelector('nav');
+ if(nav&&(s.headerMenuItems||s.headerMenu)){
+   let items=[];try{items=JSON.parse(s.headerMenuItems||'[]')}catch(e){}
+   if(!Array.isArray(items)||!items.length){
+     const map={'Home':'','All Services':'all-services.html','All Tools':'all-services.html','Categories':'all-services.html','About':'about.html','Contact':'contact.html','Privacy Policy':'privacy.html'};
+     items=String(s.headerMenu||'Home,All Services,About,Contact').split(',').map(label=>{label=label.trim();return {label,url:map[label]===undefined?'all-services.html':map[label]}})
+   }
+   nav.innerHTML=items.filter(x=>x&&String(x.label||'').trim()).map(item=>{
+     let label=String(item.label||'').trim();if(/^(all tools|categories|tools)$/i.test(label))label='All Services';
+     return '<a href="'+esc(normalUrl(item.url,label))+'">'+esc(label)+'</a>'
+   }).join('');
+ }
+ if(s.footerMenu){
+   const links=f.querySelector('.copyright span:last-child');
+   if(links){const map={'Home':'','All Services':'all-services.html','All Tools':'all-services.html','Categories':'all-services.html','About':'about.html','Contact':'contact.html','Privacy Policy':'privacy.html'};
+    links.innerHTML=String(s.footerMenu).split(',').map(label=>label.trim()).filter(Boolean).map(label=>{if(/^(all tools|categories|tools)$/i.test(label))label='All Services';return '<a href="'+esc(ROOT+(map[label]===undefined?'all-services.html':map[label]))+'">'+esc(label)+'</a>'}).join(' · ')
+   }
+ }
+}
+function loadSettings(){
+ const cb='esbdSettings_'+Date.now();window[cb]=r=>{try{delete window[cb]}catch(e){}applySettings(r)};
+ const sc=document.createElement('script');sc.src=API+'?api=1&action=getSettings&callback='+cb;sc.onerror=()=>{};document.head.appendChild(sc);
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadSettings,{once:true});else loadSettings();
+})();

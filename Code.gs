@@ -30,6 +30,7 @@ function doPost(e) {
     const data = p.payload ? JSON.parse(p.payload) : {};
     switch (String(p.action || '')) {
       case 'adminLogin': result = adminLogin(data.username, data.password); break;
+      case 'sendContactEmail': result = sendContactEmail_(data); break;
       case 'savePage': result = savePage(data.page, data.token); break;
       case 'saveSettings': result = saveSettings(data.settings, data.token); break;
       case 'getIndexHtml': result = getIndexHtml_(data.token); break;
@@ -478,4 +479,25 @@ function saveStaticHtml_(path, html, token) {
   if (Utilities.newBlob(html).getBytes().length > 2 * 1024 * 1024) throw new Error('HTML ফাইল সর্বোচ্চ 2 MB হতে পারবে।');
   githubPutFile_(path, html, 'Edit site page: ' + path);
   return {ok:true, path:path, message:path+' GitHub-এ আপডেট হয়েছে।'};
+}
+
+
+/** Public contact form handler. Sends the visitor's message to the site's configured inbox. */
+function sendContactEmail_(data) {
+  data = data || {};
+  const name = String(data.name || '').trim().slice(0,100);
+  const email = String(data.email || '').trim().slice(0,160);
+  const subject = String(data.subject || '').trim().slice(0,160);
+  const message = String(data.message || '').trim().slice(0,5000);
+  if (!name || !email || !subject || !message) throw new Error('সব ঘর পূরণ করুন।');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error('সঠিক ইমেইল ঠিকানা দিন।');
+  const recipient = 'jakareachakladar@gmail.com';
+  MailApp.sendEmail({
+    to: recipient,
+    subject: '[eServiceBD24 Contact] ' + subject,
+    replyTo: email,
+    name: 'eServiceBD24 Contact Form',
+    body: 'নতুন যোগাযোগ বার্তা\n\nনাম: ' + name + '\nইমেইল: ' + email + '\nবিষয়: ' + subject + '\n\nবার্তা:\n' + message
+  });
+  return {ok:true, message:'মেইল পাঠানো হয়েছে।'};
 }

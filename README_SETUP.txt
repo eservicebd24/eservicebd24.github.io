@@ -1,28 +1,23 @@
-eServiceBD24 CMS - corrected build
+eServiceBD24 Website UI Update
 
-Files included:
-- Code.gs (Google Apps Script backend; updated static header/footer snippet validation)
-- admin.html and admin/index.html (Admin Panel with Visual Editors + optional Advanced HTML Editor)
-- index.html, all-services.html, about.html, contact.html, privacy.html
-- header.html, footer.html, common.css, common.js
+Included files:
+- index.html: compact hero and All Services button opens the complete All Services page.
+- about.html: redesigned About page.
+- contact.html: styled contact form; sends mail to jakareachakladar@gmail.com through Apps Script.
+- all-services.html: styled responsive 5-column service grid, 20 items per page and pagination.
+- privacy.html: Bengali privacy policy.
+- common.js/common.css/header.html/footer.html: shared site shell assets.
+- Code.gs: adds sendContactEmail action using MailApp.
+- admin.html and admin/index.html: existing admin files retained.
 
-INSTALL:
-1. Back up the current GitHub repository and Apps Script project.
-2. Replace Code.gs in Apps Script with this package's Code.gs, save, then Deploy > Manage deployments > Edit > New version > Deploy.
-3. Upload/replace the website files at the repository root. Keep admin/index.html synced with admin.html.
-4. Open https://eservicebd24.github.io/admin/ and sign in.
-5. Use Header Editor / Footer Editor / About / Contact / Privacy for visual settings. Advanced HTML Editor is optional.
+INSTALL
+1. Upload/replace the website files in the GitHub Pages repository root. Keep file names exactly as shown.
+2. Open the existing Google Apps Script project, replace Code.gs with this package's Code.gs and save.
+3. Deploy > Manage deployments > Edit (pencil) > select New version > Deploy. If prompted, authorize MailApp email sending permissions.
+4. Test the contact form using a valid email address. A success notification appears only after Apps Script reports success. If Apps Script returns an error, the form displays an error instead.
+5. Hard refresh the website (Ctrl+F5).
 
-Important:
-- Apps Script must already have the correct GitHub token and spreadsheet ID in Script Properties.
-- The package has not been tested against the user's live Apps Script, Sheet, or GitHub repository. Test after deployment.
-- Service-page paths continue to use the existing category-slug behavior in Code.gs.
-
-
-LATEST FIX (2026-10-23)
-- Homepage no longer loads common.js/common.css to replace the blue index header/footer after first paint. Homepage navigation is built in the index and uses the same blue design before and after settings load.
-- Homepage reserves the service-grid area while data loads to reduce layout shift. Hero title keeps the highlighted “One Place” styling after settings are applied.
-- Page-list action buttons now use data attributes and delegated click handling; this fixes malformed inline onclick handlers when IDs are strings.
-- Website Settings panel is hidden initially and opens only from its sidebar item. Full Homepage Editor remains hidden until its own sidebar item is clicked.
-- Page HTML lookup and deletion use the all-services/ folder. Because Code.gs changed, paste it into Apps Script and Deploy a New Version before testing the action buttons.
-- After replacing index.html/admin.html/admin/index.html, hard-refresh the site (Ctrl+F5).
+IMPORTANT
+- Email sending requires the Apps Script deployment to run under an account authorized to send email. The script sends messages to jakareachakladar@gmail.com.
+- The form is protected by basic validation and length limits; for a public production site, consider adding CAPTCHA/rate limiting to prevent abuse.
+- The code has been syntax-checked locally but has not been tested against your live Apps Script deployment or live GitHub repository.
