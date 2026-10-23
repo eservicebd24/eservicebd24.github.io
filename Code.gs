@@ -165,9 +165,8 @@ function savePage(data, token) {
   const subtitle = String(data.subtitle || '').trim().slice(0,250);
   const icon = String(data.icon || '✦').slice(0,12);
   const filename = String(data.filename || makeFilename_(title)).trim();
-  const category = String(data.category || 'Other').trim().slice(0,60);
-  if (!category) throw new Error('ক্যাটাগরি নির্বাচন করুন।');
-  const categorySlug = category.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'other';
+  const category = 'all-services';
+  const categorySlug = 'all-services';
   const githubPath = categorySlug + '/' + filename;
   if (!/^[A-Za-z0-9._-]+\.html?$/i.test(filename) || /^(index|admin)\.html$/i.test(filename)) {
     throw new Error('ফাইলের নাম ইংরেজি অক্ষর/সংখ্যা দিয়ে .html হতে হবে; index.html/admin.html ব্যবহার করা যাবে না।');
