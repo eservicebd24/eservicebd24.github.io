@@ -1,1 +1,93 @@
-<!doctype html><html lang="bn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>যোগাযোগ — eServiceBD24</title><link rel="stylesheet" href="common.css"><style>*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#f4f8ff,#eaf1ff);color:#183153;font-family:Arial,"Noto Sans Bengali",sans-serif}.contact-wrap{max-width:1120px;margin:auto;padding:38px 20px 54px;min-height:68vh}.contact-head{text-align:center;margin-bottom:25px}.contact-head .eyebrow{color:#1268e8;font-weight:bold;letter-spacing:1px}.contact-head h1{font-size:clamp(30px,4vw,42px);color:#123d89;margin:10px}.contact-head p{color:#63748e;line-height:1.8}.contact-layout{display:grid;grid-template-columns:.8fr 1.2fr;gap:20px;align-items:stretch}.info,.form-card{background:#fff;border:1px solid #dce7f8;border-radius:22px;padding:clamp(22px,4vw,34px);box-shadow:0 16px 40px #153e780d}.info{background:linear-gradient(145deg,#071a3c,#0b3c91);color:white}.info h2{margin-top:0}.info p{line-height:1.8;color:#d9e8ff}.info a{color:#91e9ff;overflow-wrap:anywhere}.info-item{padding:13px 0;border-top:1px solid #ffffff26}.form-card h2{margin:0 0 8px;color:#123d89}.form-card>p{color:#687991;line-height:1.7}.field{margin-top:15px}.field label{display:block;font-size:13px;font-weight:bold;margin-bottom:7px}.field input,.field textarea{width:100%;padding:13px 14px;border:1px solid #d2deef;border-radius:12px;font:inherit;outline:none;background:#f9fbff}.field input:focus,.field textarea:focus{border-color:#287aff;box-shadow:0 0 0 3px #287aff1c}.field textarea{min-height:130px;resize:vertical}.send{margin-top:18px;border:0;border-radius:12px;padding:13px 22px;background:linear-gradient(100deg,#087bff,#573bdf);color:white;font-weight:bold;cursor:pointer}.send:disabled{opacity:.65;cursor:wait}.note{margin-top:12px;color:#65758c;font-size:12px;line-height:1.7}.toast{position:fixed;z-index:99;top:20px;left:50%;transform:translate(-50%,-20px);opacity:0;pointer-events:none;padding:15px 22px;border-radius:14px;background:#0d8b61;color:white;box-shadow:0 14px 35px #062f2440;transition:.25s;max-width:calc(100% - 28px);font-weight:bold}.toast.show{opacity:1;transform:translate(-50%,0)}.toast.error{background:#bd3045}@media(max-width:760px){.contact-wrap{padding:24px 13px}.contact-layout{grid-template-columns:1fr}}</style></head><body><header class="top" id="esbd-shared-header"><a class="brand" href="https://eservicebd24.github.io/"><span class="logo">☁</span><span class="brandtext">eServiceBD24<small>All Online Tools in One Place</small></span></a><nav><a href="https://eservicebd24.github.io/">⌂ Home</a><a href="https://eservicebd24.github.io/all-services.html">▦ All Services</a><a href="https://eservicebd24.github.io/about.html">ⓘ About</a><a href="https://eservicebd24.github.io/contact.html">✉ Contact</a></nav></header><div id="toast" class="toast" role="status" aria-live="polite"></div><main class="contact-wrap"><header class="contact-head"><span class="eyebrow">আমরা আপনার কথা শুনতে প্রস্তুত</span><h1 id="title">যোগাযোগ করুন</h1><p id="content">কোনো প্রশ্ন, পরামর্শ বা সমস্যার কথা আমাদের জানান। নিচের ফর্ম পূরণ করে বার্তা পাঠান।</p></header><section class="contact-layout"><aside class="info"><h2>যোগাযোগের তথ্য</h2><p>আপনার বার্তা সরাসরি আমাদের টিমের কাছে পৌঁছে যাবে।</p><div class="info-item">✉ ইমেইল<br><a href="mailto:jakareachakladar@gmail.com">jakareachakladar@gmail.com</a></div><div class="info-item">⏱ উত্তর<br>সম্ভব হলে যত দ্রুত সম্ভব উত্তর দেওয়ার চেষ্টা করব।</div></aside><form class="form-card" id="contactForm"><h2>আমাদের মেসেজ পাঠান</h2><p>সব ঘর পূরণ করে Send Message চাপুন।</p><div class="field"><label for="name">আপনার নাম</label><input id="name" name="name" autocomplete="name" required maxlength="100" placeholder="আপনার নাম লিখুন"></div><div class="field"><label for="email">ইমেইল ঠিকানা</label><input id="email" name="email" type="email" autocomplete="email" required maxlength="160" placeholder="name@example.com"></div><div class="field"><label for="subject">বিষয়</label><input id="subject" name="subject" required maxlength="160" placeholder="বার্তার বিষয়"></div><div class="field"><label for="message">আপনার বার্তা</label><textarea id="message" name="message" required maxlength="5000" placeholder="আপনার কথা এখানে লিখুন..."></textarea></div><button class="send" id="sendBtn" type="submit">✉ Send Message</button><div class="note">আপনার বার্তা ইমেইলের মাধ্যমে পাঠানো হবে।</div></form></section></main><iframe name="contactResponse" id="contactResponse" title="contact response" hidden></iframe><script>const API='https://script.google.com/macros/s/AKfycbySP1uhavqH3VwJDdDq6i0xDtdVA_CJRERaGTZheM0BwMBX_ttnrFK_8Zc5_qa2gHk9pA/exec';const form=document.getElementById('contactForm'),btn=document.getElementById('sendBtn'),toast=document.getElementById('toast');let sending=false;function notify(msg,err){toast.textContent=msg;toast.className='toast show'+(err?' error':'');setTimeout(()=>toast.className='toast'+(err?' error':''),5000)}form.addEventListener('submit',e=>{e.preventDefault();if(sending)return;sending=true;btn.disabled=true;btn.textContent='পাঠানো হচ্ছে…';const payload={name:form.name.value.trim(),email:form.email.value.trim(),subject:form.subject.value.trim(),message:form.message.value.trim()};const post=document.createElement('form');post.method='POST';post.action=API;post.target='contactResponse';[['api','1'],['action','sendContactEmail'],['payload',JSON.stringify(payload)],['requestId','contact-'+Date.now()]].forEach(([k,v])=>{const i=document.createElement('input');i.type='hidden';i.name=k;i.value=v;post.appendChild(i)});document.body.appendChild(post);window.addEventListener('message',function handler(ev){if(!ev.data||ev.data.type!=='esbd-api-response'||!String(ev.data.requestId).startsWith('contact-'))return;window.removeEventListener('message',handler);sending=false;btn.disabled=false;btn.textContent='✉ Send Message';if(ev.data.result&&ev.data.result.ok){form.reset();notify('✓ আপনার মেইল সফলভাবে পাঠানো হয়েছে। ধন্যবাদ!',false)}else notify('মেইল পাঠানো যায়নি: '+((ev.data.result&&ev.data.result.message)||'আবার চেষ্টা করুন।'),true)});post.submit();setTimeout(()=>{if(sending){sending=false;btn.disabled=false;btn.textContent='✉ Send Message';notify('সার্ভার থেকে উত্তর পাওয়া যায়নি। Apps Script আপডেট করে আবার চেষ্টা করুন।',true)}post.remove()},20000)});const cb='contactSettings'+Date.now();window[cb]=r=>{const s=r&&r.settings||{};if(s.contactTitle)document.getElementById('title').textContent=s.contactTitle;if(s.contactText)document.getElementById('content').textContent=s.contactText;delete window[cb]};const sc=document.createElement('script');sc.src=API+'?api=1&action=getSettings&callback='+cb;document.head.appendChild(sc)</script><script src="common.js" defer></script><footer id="esbd-shared-footer"><div class="copyright"><span class="esbd-footer-text">© 2026 eServiceBD24. All Rights Reserved.</span><span><a class="esbd-privacy-link" href="https://eservicebd24.github.io/privacy.html">Privacy Policy</a> · <a href="https://eservicebd24.github.io/">Home</a></span></div></footer></body></html>
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>যোগাযোগ করুন — eServiceBD24</title>
+<link rel="stylesheet" href="https://eservicebd24.github.io/common.css">
+<style>
+:root{--navy:#061a40;--blue:#086cff;--cyan:#22c8f6;--ink:#102b59;--muted:#637797;--line:#d8e5f7}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,"Noto Sans Bengali",sans-serif;color:var(--ink);background:#edf5ff}
+a{text-decoration:none}
+#header-slot:empty{min-height:0}#footer-slot:empty{min-height:0}
+.contact-hero{position:relative;overflow:hidden;background:radial-gradient(ellipse at 80% 20%,#164de0 0,#082c7b 38%,#041735 100%);color:#fff;padding:42px 18px 76px;text-align:center}
+.contact-hero:before,.contact-hero:after{content:"";position:absolute;border:1px solid #7edaff30;border-radius:50%;width:340px;height:340px;pointer-events:none}.contact-hero:before{left:-140px;top:-180px}.contact-hero:after{right:-120px;bottom:-240px}
+.hero-inner{max-width:1100px;margin:auto;position:relative;z-index:1}.eyebrow{display:inline-block;border-radius:30px;background:#ffffff17;border:1px solid #ffffff35;padding:8px 15px;color:#bdeaff;font-weight:700;font-size:13px}
+.contact-hero h1{font-size:clamp(32px,5vw,52px);line-height:1.2;margin:14px 0 10px}.contact-hero h1 span{color:#3bd8ff}.contact-hero p{font-size:clamp(15px,2vw,18px);line-height:1.8;color:#e0edff;max-width:680px;margin:0 auto}
+.wrap{max-width:1180px;margin:-42px auto 0;padding:0 18px 48px;position:relative;z-index:2}.layout{display:grid;grid-template-columns:.82fr 1.3fr;gap:20px;align-items:stretch}
+.info,.form-card{border:1px solid #fff;border-radius:24px;background:#fff;box-shadow:0 18px 50px #153e7815;padding:clamp(20px,3vw,32px);min-width:0}
+.info{background:linear-gradient(150deg,#061a40,#0a3e9c);color:#fff;overflow:hidden;position:relative}.info h2,.form-card h2{margin:0 0 8px;font-size:clamp(21px,2.5vw,27px)}.info-intro{color:#d5e7ff;line-height:1.8;margin:0 0 18px}
+.info-card{display:flex;gap:13px;align-items:flex-start;background:#ffffff0d;border:1px solid #ffffff24;border-radius:16px;padding:15px;margin-top:12px}.ico{width:44px;height:44px;flex:0 0 44px;border-radius:14px;display:grid;place-items:center;font-size:23px;background:#ffffff20}.info-card h3{font-size:16px;margin:2px 0 5px}.info-card p{font-size:13px;line-height:1.7;color:#d6e7ff;margin:0}.wa-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin-top:15px;border:0;border-radius:13px;padding:14px 16px;background:linear-gradient(100deg,#12c76a,#079b55);color:white;font-weight:800;font-size:15px;box-shadow:0 8px 20px #00a85b35}.wa-btn:hover{filter:brightness(1.04)}.phone-note{font-size:12px;color:#d0e1ff;text-align:center;margin-top:10px}
+.form-card h2{color:#123d89}.form-intro{color:var(--muted);line-height:1.7;margin:0 0 16px}.fields{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}.field{margin-top:14px;min-width:0}.field.full{grid-column:1/-1}.field label{display:block;font-size:13px;font-weight:800;margin-bottom:7px;color:#15345f}.field input,.field select,.field textarea{display:block;width:100%;min-width:0;padding:13px 14px;border:1px solid #d2deef;border-radius:12px;font:inherit;color:#183153;outline:none;background:#fbfdff}.field input:focus,.field select:focus,.field textarea:focus{border-color:#287aff;box-shadow:0 0 0 3px #287aff1c}.field textarea{min-height:128px;resize:vertical}.filebox{border:1.5px dashed #82adff;border-radius:14px;background:#f5f9ff;padding:17px;text-align:center;color:#31547e}.filebox input{margin-top:10px;max-width:100%;font-size:13px}.file-note{font-size:12px;color:#7083a0;line-height:1.6;margin-top:7px}.send{width:100%;margin-top:18px;border:0;border-radius:13px;padding:15px 20px;background:linear-gradient(100deg,#087bff,#352dff);color:#fff;font-weight:800;font-size:16px;cursor:pointer}.send:disabled{opacity:.65;cursor:wait}.note{margin-top:11px;color:#71819a;font-size:12px;line-height:1.7}.toast{position:fixed;z-index:999;top:18px;left:50%;transform:translate(-50%,-20px);opacity:0;pointer-events:none;padding:14px 20px;border-radius:14px;background:#0d8b61;color:#fff;box-shadow:0 14px 35px #062f2440;transition:.25s;max-width:calc(100% - 28px);font-weight:bold}.toast.show{opacity:1;transform:translate(-50%,0)}.toast.error{background:#bd3045}
+@media(max-width:780px){.contact-hero{padding:32px 15px 65px}.wrap{padding:0 12px 30px;margin-top:-34px}.layout{grid-template-columns:1fr;gap:14px}.info,.form-card{border-radius:19px;padding:21px}.info-card{padding:13px}.fields{grid-template-columns:1fr}.field.full{grid-column:auto}.contact-hero h1{font-size:34px}.contact-hero p{font-size:15px}.send{padding:15px}.filebox{padding:14px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="header-slot"></div>
+<section class="contact-hero"><div class="hero-inner">
+<span class="eyebrow">আপনার পাশে আমরা</span>
+<h1>যোগাযোগ <span>করুন</span></h1>
+<p id="contactIntro">আপনার প্রশ্ন, পরামর্শ বা সমস্যার কথা আমাদের জানান। আমরা যত দ্রুত সম্ভব সহায়তা করার চেষ্টা করব।</p>
+</div></section>
+<main class="wrap"><div class="layout">
+<aside class="info">
+<h2>আমাদের সাথে যোগাযোগের উপায়</h2>
+<p class="info-intro">আপনার জন্য সুবিধাজনকভাবে আমাদের সঙ্গে যোগাযোগ করুন। WhatsApp-এ সরাসরি চ্যাট শুরু করতে নিচের বাটনে চাপ দিন।</p>
+<div class="info-card"><div class="ico">🟢</div><div><h3>WhatsApp-এ সরাসরি কথা বলুন</h3><p>সার্ভিস সংক্রান্ত প্রশ্ন, নতুন ফিচারের অনুরোধ বা কোনো সমস্যা জানাতে WhatsApp-এ মেসেজ দিন।</p></div></div>
+<a class="wa-btn" id="whatsappLink" href="https://wa.me/8801303072964?text=আসসালামু%20আলাইকুম%2C%20আমি%20eServiceBD24-এর%20সঙ্গে%20যোগাযোগ%20করতে%20চাই।" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">☏</span> WhatsApp-এ চ্যাট শুরু করুন ↗</a>
+
+<div class="info-card"><div class="ico">⚡</div><div><h3>দ্রুত সহায়তা</h3><p>সমস্যার স্ক্রিনশট বা প্রয়োজনীয় তথ্য পাঠালে বুঝতে ও সমাধান করতে সুবিধা হবে।</p></div></div>
+<div class="info-card"><div class="ico">🔒</div><div><h3>আপনার তথ্যের গোপনীয়তা</h3><p>শুধুমাত্র আপনার অনুরোধের উত্তর দিতে প্রয়োজনীয় তথ্য ব্যবহার করা হবে।</p></div></div>
+</aside>
+<form class="form-card" id="contactForm">
+<h2>আমাদের মেসেজ পাঠান</h2><p class="form-intro">WhatsApp ব্যবহার না করেও এই ফর্মের মাধ্যমে আপনার বার্তা পাঠাতে পারেন।</p>
+<div class="fields">
+<div class="field"><label for="name">আপনার নাম *</label><input id="name" name="name" autocomplete="name" required maxlength="100" placeholder="আপনার নাম লিখুন"></div>
+<div class="field"><label for="email">ইমেইল ঠিকানা *</label><input id="email" name="email" type="email" autocomplete="email" required maxlength="160" placeholder="আপনার ইমেইল লিখুন"></div>
+<div class="field full"><label for="subject">বিষয় *</label><select id="subject" name="subject" required><option value="">বিষয় নির্বাচন করুন</option><option>সার্ভিস ব্যবহার সংক্রান্ত সমস্যা</option><option>নতুন সার্ভিসের অনুরোধ</option><option>ভুল বা বাগ রিপোর্ট</option><option>পরামর্শ বা মতামত</option><option>অন্যান্য</option></select></div>
+<div class="field full"><label for="message">আপনার বার্তা *</label><textarea id="message" name="message" required maxlength="5000" placeholder="আপনার প্রশ্ন, পরামর্শ বা সমস্যার বিস্তারিত লিখুন..."></textarea></div>
+<div class="field full"><label for="attachments">ফাইল সংযুক্ত করুন (ঐচ্ছিক)</label><div class="filebox">📎 স্ক্রিনশট, ছবি বা ডকুমেন্ট নির্বাচন করুন<input id="attachments" name="attachments" type="file" accept=".png,.jpg,.jpeg,.webp,.pdf,.doc,.docx,.zip" multiple><div class="file-note">সর্বোচ্চ ৫টি ফাইল নির্বাচন করা যাবে।</div></div></div>
+</div>
+<button class="send" id="sendBtn" type="submit">✉ মেসেজ পাঠান</button>
+<div class="note">বার্তা পাঠাতে সমস্যা হলে WhatsApp বাটন ব্যবহার করে সরাসরি যোগাযোগ করুন।</div>
+</form></div></main>
+<div id="footer-slot"></div><div id="toast" class="toast" role="status" aria-live="polite"></div>
+<iframe name="contactResponse" id="contactResponse" title="contact response" hidden></iframe>
+<script>
+const API='https://script.google.com/macros/s/AKfycbySP1uhavqH3VwJDdDq6i0xDtdVA_CJRERaGTZheM0BwMBX_ttnrFK_8Zc5_qa2gHk9pA/exec';
+const ROOT='https://eservicebd24.github.io/';
+async function loadSharedPart(file,slot,selector){
+ const target=document.getElementById(slot);
+ try{
+  const response=await fetch(ROOT+file,{cache:'no-cache'});
+  if(!response.ok) throw new Error(file+' লোড হয়নি ('+response.status+')');
+  const source=await response.text(),doc=new DOMParser().parseFromString(source,'text/html');
+  const node=doc.querySelector(selector);
+  if(!node) throw new Error(file+'-এ '+selector+' পাওয়া যায়নি');
+  target.replaceChildren(document.importNode(node,true));
+ }catch(err){console.error('Shared shell:',err);target.dataset.loadError=String(err.message||err);}
+}
+Promise.all([loadSharedPart('header.html','header-slot','#esbd-shared-header'),loadSharedPart('footer.html','footer-slot','#esbd-shared-footer')]);
+const form=document.getElementById('contactForm'),btn=document.getElementById('sendBtn'),toast=document.getElementById('toast');
+let sending=false;
+function notify(msg,err){toast.textContent=msg;toast.className='toast show'+(err?' error':'');setTimeout(()=>toast.className='toast'+(err?' error':''),5000)}
+form.addEventListener('submit',e=>{
+ e.preventDefault();if(sending)return;
+ const files=[...document.getElementById('attachments').files];
+ if(files.length>5){notify('সর্বোচ্চ ৫টি ফাইল নির্বাচন করুন।',true);return}
+ if(files.length){notify('ফাইলসহ বার্তা পাঠানোর জন্য সার্ভারের Apps Script-এ attachment সমর্থন যুক্ত করতে হবে। আপাতত WhatsApp-এ ফাইল পাঠাতে পারেন।',true);return}
+ sending=true;btn.disabled=true;btn.textContent='পাঠানো হচ্ছে…';
+ const payload={name:form.elements.name.value.trim(),email:form.elements.email.value.trim(),subject:form.elements.subject.value.trim(),message:form.elements.message.value.trim()};
+ const post=document.createElement('form');post.method='POST';post.action=API;post.target='contactResponse';
+ [['api','1'],['action','sendContactEmail'],['payload',JSON.stringify(payload)],['requestId','contact-'+Date.now()]].forEach(([k,v])=>{const i=document.createElement('input');i.type='hidden';i.name=k;i.value=v;post.appendChild(i)});
+ document.body.appendChild(post);
+ const timeout=setTimeout(()=>{if(sending){sending=false;btn.disabled=false;btn.textContent='✉ মেসেজ পাঠান';notify('সার্ভার থেকে উত্তর পাওয়া যায়নি। পরে আবার চেষ্টা করুন বা WhatsApp ব্যবহার করুন।',true)}post.remove()},20000);
+ const handler=ev=>{if(!ev.data||ev.data.type!=='esbd-api-response'||!String(ev.data.requestId).startsWith('contact-'))return;window.removeEventListener('message',handler);clearTimeout(timeout);sending=false;btn.disabled=false;btn.textContent='✉ মেসেজ পাঠান';if(ev.data.result&&ev.data.result.ok){form.reset();notify('✓ আপনার বার্তা পাঠানো হয়েছে। ধন্যবাদ!',false)}else notify('বার্তা পাঠানো যায়নি: '+((ev.data.result&&ev.data.result.message)||'আবার চেষ্টা করুন।'),true);post.remove()};
+ window.addEventListener('message',handler);post.submit();
+});
+const cb='contactSettings'+Date.now();window[cb]=r=>{const s=r&&r.settings||{};if(s.contactTitle)document.querySelector('.contact-hero h1').textContent=s.contactTitle;if(s.contactText)document.getElementById('contactIntro').textContent=s.contactText;delete window[cb]};
+const sc=document.createElement('script');sc.src=API+'?api=1&action=getSettings&callback='+cb;sc.onerror=()=>{};document.head.appendChild(sc);
+</script>
+<script src="https://eservicebd24.github.io/common.js" defer></script>
+</body></html>
