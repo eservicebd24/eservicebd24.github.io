@@ -1,44 +1,49 @@
-<!-- eServiceBD24 Shared Header: keep this file in the repository root -->
-<header id="esbd-shared-header" data-esbd-shell="header" style="box-sizing:border-box;width:100%;background:#101b3b;color:#fff;padding:12px clamp(14px,3vw,32px);font-family:Arial,sans-serif;">
-  <div style="max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
-    <a href="https://eservicebd24.github.io/" style="display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-weight:800;min-width:0;">
-      <span aria-hidden="true" style="display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#4f8cff,#7658ed);font-size:25px;flex-shrink:0;">☁</span>
-      <span style="font-size:18px;line-height:1.25;">eServiceBD24<small style="display:block;font-size:11px;font-weight:500;color:#c9d5f4;margin-top:3px;">All Online Tools in One Place</small></span>
+<!-- eServiceBD24 Shared Header: desktop links + mobile menu, self-contained -->
+<header id="esbd-shared-header" style="box-sizing:border-box;width:100%;background:linear-gradient(100deg,#041632,#062e70 65%,#172bc0);color:#fff;padding:12px clamp(14px,3vw,32px);font-family:Arial,sans-serif;position:relative;z-index:1000;">
+  <style>
+    #esbd-shared-header *{box-sizing:border-box}
+    #esbd-shared-header .esbd-header-inner{max-width:1350px;margin:0 auto;display:flex;align-items:center;gap:18px;min-height:44px}
+    #esbd-shared-header .esbd-brand{display:flex;align-items:center;gap:11px;color:#fff;text-decoration:none;font-weight:800;min-width:0;flex-shrink:0}
+    #esbd-shared-header .esbd-logo{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#18c8ff,#087bff);font-size:25px;flex-shrink:0}
+    #esbd-shared-header .esbd-brandtext{font-size:19px;line-height:1.2}
+    #esbd-shared-header .esbd-brandtext small{display:block;font-size:11px;font-weight:500;color:#d8e6ff;margin-top:3px}
+    #esbd-shared-header .esbd-desktop-nav{display:flex;align-items:center;justify-content:flex-end;gap:3px;margin-left:auto}
+    #esbd-shared-header .esbd-desktop-nav a,#esbd-shared-header .esbd-mobile-nav a{display:block;color:#fff;text-decoration:none;padding:10px 12px;border-radius:8px;font-size:14px;font-weight:700;white-space:nowrap}
+    #esbd-shared-header .esbd-desktop-nav a:hover,#esbd-shared-header .esbd-mobile-nav a:hover{background:#ffffff20}
+    #esbd-shared-header .esbd-mobile-menu{display:none;position:relative;margin-left:auto}
+    #esbd-shared-header .esbd-menu-button{border:1px solid #ffffff66;background:#ffffff12;color:#fff;border-radius:9px;padding:10px 13px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap}
+    #esbd-shared-header .esbd-mobile-nav{display:none;position:absolute;right:0;top:calc(100% + 8px);min-width:200px;background:#101b3b;border:1px solid #ffffff30;border-radius:12px;padding:7px;box-shadow:0 12px 30px #0005}
+    #esbd-shared-header .esbd-mobile-menu[open] .esbd-mobile-nav{display:block}
+    #esbd-shared-header .esbd-mobile-menu summary{list-style:none}
+    #esbd-shared-header .esbd-mobile-menu summary::-webkit-details-marker{display:none}
+    @media(max-width:760px){
+      #esbd-shared-header{padding:10px 13px!important}
+      #esbd-shared-header .esbd-header-inner{gap:9px}
+      #esbd-shared-header .esbd-brandtext{font-size:16px}
+      #esbd-shared-header .esbd-logo{width:39px;height:39px;font-size:23px}
+      #esbd-shared-header .esbd-desktop-nav{display:none!important}
+      #esbd-shared-header .esbd-mobile-menu{display:block!important}
+    }
+  </style>
+  <div class="esbd-header-inner">
+    <a class="esbd-brand" href="https://eservicebd24.github.io/" aria-label="eServiceBD24 Home">
+      <span class="esbd-logo" aria-hidden="true">☁</span>
+      <span class="esbd-brandtext">eServiceBD24<small>All Online Tools in One Place</small></span>
     </a>
-    <details style="position:relative;margin-left:auto;color:#fff;">
-      <summary aria-label="Open navigation menu" style="cursor:pointer;list-style:none;border:1px solid #ffffff55;background:#ffffff12;color:#fff;border-radius:9px;padding:10px 13px;font-size:14px;font-weight:700;white-space:nowrap;">☰ Menu</summary>
-      <nav aria-label="Main navigation" style="position:absolute;z-index:9999;right:0;top:calc(100% + 8px);min-width:190px;background:#101b3b;border:1px solid #ffffff30;border-radius:12px;padding:7px;box-shadow:0 12px 30px #0005;display:flex;flex-direction:column;gap:3px;">
-        <a href="https://eservicebd24.github.io/" style="display:block;color:#fff;text-decoration:none;padding:11px 12px;border-radius:7px;">⌂ Home</a>
-        <a href="https://eservicebd24.github.io/all-services.html" style="display:block;color:#fff;text-decoration:none;padding:11px 12px;border-radius:7px;">▦ All Services</a>
-        <a href="https://eservicebd24.github.io/about.html" style="display:block;color:#fff;text-decoration:none;padding:11px 12px;border-radius:7px;">ⓘ About</a>
-        <a href="https://eservicebd24.github.io/contact.html" style="display:block;color:#fff;text-decoration:none;padding:11px 12px;border-radius:7px;">✉ Contact</a>
+    <nav class="esbd-desktop-nav" aria-label="Main navigation">
+      <a href="https://eservicebd24.github.io/">⌂ Home</a>
+      <a href="https://eservicebd24.github.io/all-services.html">▦ All Services</a>
+      <a href="https://eservicebd24.github.io/about.html">ⓘ About</a>
+      <a href="https://eservicebd24.github.io/contact.html">✉ Contact</a>
+    </nav>
+    <details class="esbd-mobile-menu">
+      <summary class="esbd-menu-button">☰ Menu</summary>
+      <nav class="esbd-mobile-nav" aria-label="Mobile navigation">
+        <a href="https://eservicebd24.github.io/">⌂ Home</a>
+        <a href="https://eservicebd24.github.io/all-services.html">▦ All Services</a>
+        <a href="https://eservicebd24.github.io/about.html">ⓘ About</a>
+        <a href="https://eservicebd24.github.io/contact.html">✉ Contact</a>
       </nav>
     </details>
   </div>
-<style>
-#esbd-shared-header details>summary::-webkit-details-marker{display:none}
-#esbd-shared-header details[open] nav a:hover{background:#ffffff18}
-#esbd-shared-header details > summary::-webkit-details-marker{display:none}
-#esbd-shared-header details nav a:hover{background:#ffffff18}
-#esbd-shared-header details > summary{display:inline-block}
-#esbd-shared-header details nav{display:flex;flex-direction:column}
-@media (min-width:760px){
-  #esbd-shared-header details{margin-left:auto}
-  #esbd-shared-header details > summary{display:none!important}
-  #esbd-shared-header details nav{
-    position:static!important;display:flex!important;flex-direction:row!important;
-    align-items:center;min-width:0!important;background:transparent!important;
-    border:0!important;padding:0!important;box-shadow:none!important;
-  }
-  #esbd-shared-header details nav a{padding:10px 12px!important;white-space:nowrap}
-}
-@media (max-width:759px){
-  #esbd-shared-header details nav{position:absolute;right:0;top:calc(100% + 8px);
-    z-index:9999;min-width:190px;background:#101b3b;border:1px solid #ffffff30;
-    border-radius:12px;padding:7px;box-shadow:0 12px 30px #0005;
-    display:flex;flex-direction:column;gap:3px}
-}
-
-</style>
 </header>
-
