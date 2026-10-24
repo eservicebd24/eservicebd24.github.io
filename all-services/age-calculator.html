@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="bn"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Bagerhat Vision Advanced Age Calculator — জন্মতারিখ থেকে বয়স, মোট দিন ও পরবর্তী জন্মদিন হিসাব করুন।">
+<title>Age Calculator / বয়স হিসাব করুন | Bagerhat Vision</title>
+<style>
+:root{--deep:#063f3b;--deep2:#052f2d;--green:#00a86b;--green2:#078b5a;--ink:#12232e;--muted:#60717d;--line:#dce5e9;--paper:#fff;--bg:#f5f8f8}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans Bengali","Hind Siliguri",system-ui,-apple-system,"Segoe UI",sans-serif}
+button,input{font:inherit}
+#site-header,#site-footer{width:100%}
+main{max-width:1500px;margin:0 auto;padding:24px clamp(14px,3.9vw,60px) 26px}
+.hero{min-height:145px;border-radius:13px;overflow:hidden;display:flex;align-items:center;gap:28px;padding:24px 32px;margin-bottom:22px;background:linear-gradient(90deg,#e5f5ed 0%,#eff8f2 62%,#d5eadc 100%);position:relative;box-shadow:0 2px 8px #0b443b0d}
+.hero:after{content:"🎂";position:absolute;right:5%;bottom:-16px;font-size:100px;filter:drop-shadow(0 8px 8px #234a3420);opacity:.9}
+.hero-icon{width:86px;height:86px;flex:0 0 86px;display:grid;place-items:center;border-radius:18px;background:#075b3b;color:white;font-size:47px;box-shadow:inset 0 0 0 1px #ffffff30}
+.hero h1{font-size:clamp(24px,3vw,38px);margin:0 0 7px;line-height:1.3;color:#10252b;font-weight:850}
+.hero p{margin:0;color:#23544b;font-size:clamp(14px,1.4vw,19px);line-height:1.7}
+.layout{display:grid;grid-template-columns:minmax(320px,.82fr) minmax(0,1.18fr);gap:18px;align-items:stretch}
+.panel{background:#fff;border:1px solid #e3e9ec;border-radius:12px;overflow:hidden;box-shadow:0 2px 5px #102e3510}
+.panel-title{background:linear-gradient(100deg,var(--deep),#034d46);color:#fff;padding:15px 21px;display:flex;align-items:center;gap:13px;font-size:22px;font-weight:750;min-height:68px}
+.panel-title .ico{font-size:25px}
+.panel-body{padding:22px 21px 23px}
+.field{margin-bottom:22px}
+label,.field-label{display:block;font-size:17px;font-weight:700;margin-bottom:9px;color:#172832}
+.input-wrap{position:relative}
+input[type=date]{width:100%;height:58px;border:1px solid #d6e0e5;border-radius:10px;padding:0 15px;background:#fff;color:#1c2d36;outline:none;box-shadow:inset 0 1px 2px #102e3507}
+input[type=date]:focus{border-color:#08a66c;box-shadow:0 0 0 3px #08a66c20}
+.radio-list{display:grid;gap:12px;padding:3px 2px 0}
+.radio-row{display:flex;align-items:center;gap:12px;font-size:17px;cursor:pointer}
+.radio-row input{accent-color:#08a66c;width:22px;height:22px;margin:0}
+.actions{display:grid;grid-template-columns:1.2fr .8fr;gap:12px;margin-top:25px}
+.btn{border:0;border-radius:9px;min-height:59px;padding:12px 15px;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;font-size:19px;font-weight:750;transition:transform .15s,filter .15s}
+.btn:hover{filter:brightness(.97);transform:translateY(-1px)}
+.btn-primary{background:linear-gradient(100deg,#00a96c,#07985f);color:#fff;box-shadow:0 5px 12px #00a96c1b}
+.btn-reset{background:#edf1f5;color:#435664;font-weight:650}
+.error{display:none;background:#fff0f0;color:#b42318;border:1px solid #ffd0d0;padding:11px 13px;border-radius:8px;margin-top:15px;font-size:14px}
+.result-top{background:linear-gradient(120deg,#e8f8ef,#f0faf4);border-radius:11px;padding:22px;display:flex;align-items:center;gap:22px;min-height:185px;margin-bottom:16px}
+.cake{flex:0 0 195px;display:grid;place-items:center;font-size:82px;filter:drop-shadow(0 7px 5px #28664b18)}
+.result-kicker{font-size:20px;color:#075744;font-weight:750;margin-bottom:3px}
+.age-number{font-size:clamp(28px,3vw,48px);line-height:1.3;font-weight:900;letter-spacing:-1px;color:#075a43}
+.as-of{font-size:17px;color:#61737d;margin-top:4px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.stat{min-height:122px;border-radius:11px;padding:17px 13px;display:flex;align-items:flex-start;gap:12px}
+.stat .stat-icon{font-size:27px;line-height:1.2}
+.stat .stat-label{font-size:15px;font-weight:700;margin-bottom:5px;color:#163345}
+.stat .stat-value{font-size:26px;font-weight:850;line-height:1.3;color:#10243a;overflow-wrap:anywhere}
+.stat .stat-sub{font-size:13px;color:#5c6d79;margin-top:3px;line-height:1.5}
+.blue{background:linear-gradient(135deg,#e9f4ff,#eff1ff)}.sky{background:linear-gradient(135deg,#e8f6ff,#edf7ff)}.purple{background:linear-gradient(135deg,#f4edff,#f8f2ff)}.pink{background:linear-gradient(135deg,#fff0f1,#fff3f4)}.green{background:linear-gradient(135deg,#e9faee,#f2fbf0)}.gold{background:linear-gradient(135deg,#fff7df,#fff9ec)}
+.blue .stat-icon{color:#2765dd}.sky .stat-icon{color:#1799e8}.purple .stat-icon{color:#933ee0}.pink .stat-icon{color:#ef3340}.green .stat-icon{color:#16813d}.gold .stat-icon{color:#c48a00}
+.small-note{font-size:13px;color:#71808a;line-height:1.6;margin:16px 2px 0}
+.loading{color:#536773}
+@media(max-width:1000px){.layout{grid-template-columns:1fr}.hero:after{right:3%}.result-top{min-height:160px}.cake{flex-basis:150px}}
+@media(max-width:600px){main{padding:14px 12px 20px}.hero{padding:18px 16px;gap:13px;min-height:120px;margin-bottom:15px}.hero-icon{width:55px;height:55px;flex-basis:55px;font-size:30px;border-radius:12px}.hero h1{font-size:23px}.hero p{font-size:13px;max-width:90%}.hero:after{font-size:58px;right:-5px;bottom:-7px;opacity:.28}.layout{gap:14px}.panel-title{font-size:19px;min-height:58px;padding:13px 16px}.panel-body{padding:17px 15px}.field{margin-bottom:19px}label,.field-label{font-size:16px}.actions{grid-template-columns:1fr  .75fr;gap:8px}.btn{font-size:16px;min-height:53px;padding:10px 8px}.result-top{padding:16px 13px;gap:9px;min-height:140px}.cake{font-size:55px;flex-basis:72px}.result-kicker{font-size:15px}.age-number{font-size:clamp(23px,6vw,33px);letter-spacing:-.5px}.as-of{font-size:13px}.stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.stat{min-height:112px;padding:13px 10px;gap:8px}.stat .stat-icon{font-size:22px}.stat .stat-label{font-size:13px}.stat .stat-value{font-size:22px}.stat .stat-sub{font-size:12px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+<link rel="stylesheet" href="https://eservicebd24.github.io/common.css"><link id="esbd-shared-assets" rel="stylesheet" href="https://eservicebd24.github.io/common.css"><script src="https://eservicebd24.github.io/common.js" defer></script></head>
+<body><div id="esbd-header-slot"></div>
+<div id="site-header" aria-label="ওয়েবসাইট হেডার"></div>
+<main>
+  <section class="hero">
+    <div class="hero-icon" aria-hidden="true">▦</div>
+    <div>
+      <h1>Age Calculator / বয়স হিসাব করুন</h1>
+      <p>আপনার জন্ম তারিখ দিয়ে সহজেই বর্তমান বয়স, পরবর্তী জন্মদিন ও বিস্তারিত তথ্য জেনে নিন</p>
+    </div>
+  </section>
+  <div class="layout">
+    <section class="panel" aria-labelledby="input-title">
+      <div class="panel-title" id="input-title"><span class="ico" aria-hidden="true">⚙</span> জন্ম তারিখ দিন</div>
+      <div class="panel-body">
+        <div class="field">
+          <label for="birthDate">জন্ম তারিখ</label>
+          <input id="birthDate" type="date" value="2000-10-22" max="9999-12-31">
+        </div>
+        <div class="field">
+          <label for="asOfDate">হিসাবের তারিখ (ঐচ্ছিক)</label>
+          <input id="asOfDate" type="date">
+        </div>
+        <div class="field">
+          <span class="field-label">বয়স দেখানোর ধরন</span>
+          <div class="radio-list">
+            <label class="radio-row"><input type="radio" name="viewMode" value="full" checked=""> পূর্ণ বছর, মাস, দিন</label>
+            <label class="radio-row"><input type="radio" name="viewMode" value="years"> শুধু বছর</label>
+            <label class="radio-row"><input type="radio" name="viewMode" value="days"> মোট দিন (Days)</label>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" id="calculateBtn" type="button"><span aria-hidden="true">▦</span> হিসাব করুন</button>
+          <button class="btn btn-reset" id="resetBtn" type="button"><span aria-hidden="true">↻</span> রিসেট</button>
+        </div>
+        <div class="error" id="errorBox" role="alert"></div>
+      </div>
+    </section>
+    <section class="panel" aria-labelledby="result-title">
+      <div class="panel-title" id="result-title"><span class="ico" aria-hidden="true">▮</span> আপনার বয়সের ফলাফল</div>
+      <div class="panel-body">
+        <div class="result-top" aria-live="polite">
+          <div class="cake" aria-hidden="true">🎂</div>
+          <div>
+            <div class="result-kicker">আপনার বর্তমান বয়স</div>
+            <div class="age-number" id="ageResult">২৫ বছর ০ মাস ০ দিন</div>
+            <div class="as-of" id="asOfLabel">হিসাবের তারিখ অনুযায়ী</div>
+          </div>
+        </div>
+        <div class="stats">
+          <article class="stat blue"><div class="stat-icon">▦</div><div><div class="stat-label">মোট বছর</div><div class="stat-value" id="totalYears">২৫</div><div class="stat-sub">বছর</div></div></article>
+          <article class="stat sky"><div class="stat-icon">▦</div><div><div class="stat-label">মোট মাস</div><div class="stat-value" id="totalMonths">৩০০</div><div class="stat-sub">মাস (পূর্ণ মাস)</div></div></article>
+          <article class="stat purple"><div class="stat-icon">▦</div><div><div class="stat-label">মোট দিন</div><div class="stat-value" id="totalDays">৯,১৩১</div><div class="stat-sub">দিন</div></div></article>
+          <article class="stat pink"><div class="stat-icon">◷</div><div><div class="stat-label">পরবর্তী জন্মদিন</div><div class="stat-value" id="nextBirthday" style="font-size:19px">২২ অক্টোবর ২০২৬</div><div class="stat-sub" id="daysUntil">আরও ৩৬৫ দিন বাকি</div></div></article>
+          <article class="stat sky"><div class="stat-icon">🎂</div><div><div class="stat-label">আপনার জন্মদিন ছিল</div><div class="stat-value" id="birthWeekday" style="font-size:21px">রবিবার</div><div class="stat-sub" id="birthDateLabel">(২২ অক্টোবর ২০০০)</div></div></article>
+          <article class="stat green"><div class="stat-icon">♎</div><div><div class="stat-label">রাশি (আনুমানিক)</div><div class="stat-value" id="zodiac" style="font-size:20px">তুলা (Libra)</div><div class="stat-sub" id="zodiacDates">(২৩ সেপ্টেম্বর – ২২ অক্টোবর)</div></div></article>
+        </div>
+        <p class="small-note">বয়স ও দিনসংখ্যা গ্রেগরিয়ান ক্যালেন্ডার অনুযায়ী হিসাব করা হয়। রাশি প্রচলিত তারিখসীমার ভিত্তিতে আনুমানিক দেখানো হয়।</p>
+      </div>
+    </section>
+  </div>
+</main>
+<div id="site-footer" aria-label="ওয়েবসাইট ফুটার"></div>
+<script>
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const bn = value => Number(value).toLocaleString('bn-BD');
+  const monthsBn = ['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
+  const weekdays = ['রবিবার','সোমবার','মঙ্গলবার','বুধবার','বৃহস্পতিবার','শুক্রবার','শনিবার'];
+  const toISO = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const parseDate = value => {
+    if (!value) return null;
+    const parts = value.split('-').map(Number);
+    if (parts.length !== 3 || parts.some(n => !Number.isFinite(n))) return null;
+    const d = new Date(parts[0], parts[1]-1, parts[2]);
+    return d.getFullYear()===parts[0] && d.getMonth()===parts[1]-1 && d.getDate()===parts[2] ? d : null;
+  };
+  const daysBetween = (a,b) => Math.round((Date.UTC(b.getFullYear(),b.getMonth(),b.getDate())-Date.UTC(a.getFullYear(),a.getMonth(),a.getDate()))/86400000);
+  const formatDate = d => `${bn(d.getDate())} ${monthsBn[d.getMonth()]} ${bn(d.getFullYear())}`;
+  const clampBirthday = (year, birth) => new Date(year, birth.getMonth(), Math.min(birth.getDate(), new Date(year,birth.getMonth()+1,0).getDate()));
+  const getAge = (birth, asOf) => {
+    let years = asOf.getFullYear()-birth.getFullYear();
+    let anniversary = clampBirthday(asOf.getFullYear(),birth);
+    if (asOf < anniversary) years--;
+    let anchor = clampBirthday(birth.getFullYear()+years,birth);
+    let months = (asOf.getFullYear()-anchor.getFullYear())*12 + asOf.getMonth()-anchor.getMonth();
+    let monthAnchor = new Date(anchor.getFullYear(),anchor.getMonth()+months,Math.min(anchor.getDate(),new Date(anchor.getFullYear(),anchor.getMonth()+months+1,0).getDate()));
+    if(monthAnchor > asOf) months--;
+    monthAnchor = new Date(anchor.getFullYear(),anchor.getMonth()+months,Math.min(anchor.getDate(),new Date(anchor.getFullYear(),anchor.getMonth()+months+1,0).getDate()));
+    const days = daysBetween(monthAnchor,asOf);
+    return {years, months, days, totalDays:daysBetween(birth,asOf), totalMonths:years*12+months};
+  };
+  const zodiacData = d => {
+    const m=d.getMonth()+1, day=d.getDate();
+    if ((m===3&&day>=21)||(m===4&&day<=19)) return ['মেষ (Aries)','২১ মার্চ – ১৯ এপ্রিল'];
+    if ((m===4&&day>=20)||(m===5&&day<=20)) return ['বৃষ (Taurus)','২০ এপ্রিল – ২০ মে'];
+    if ((m===5&&day>=21)||(m===6&&day<=20)) return ['মিথুন (Gemini)','২১ মে – ২০ জুন'];
+    if ((m===6&&day>=21)||(m===7&&day<=22)) return ['কর্কট (Cancer)','২১ জুন – ২২ জুলাই'];
+    if ((m===7&&day>=23)||(m===8&&day<=22)) return ['সিংহ (Leo)','২৩ জুলাই – ২২ আগস্ট'];
+    if ((m===8&&day>=23)||(m===9&&day<=22)) return ['কন্যা (Virgo)','২৩ আগস্ট – ২২ সেপ্টেম্বর'];
+    if ((m===9&&day>=23)||(m===10&&day<=22)) return ['তুলা (Libra)','২৩ সেপ্টেম্বর – ২২ অক্টোবর'];
+    if ((m===10&&day>=23)||(m===11&&day<=21)) return ['বৃশ্চিক (Scorpio)','২৩ অক্টোবর – ২১ নভেম্বর'];
+    if ((m===11&&day>=22)||(m===12&&day<=21)) return ['ধনু (Sagittarius)','২২ নভেম্বর – ২১ ডিসেম্বর'];
+    if ((m===12&&day>=22)||(m===1&&day<=19)) return ['মকর (Capricorn)','২২ ডিসেম্বর – ১৯ জানুয়ারি'];
+    if ((m===1&&day>=20)||(m===2&&day<=18)) return ['কুম্ভ (Aquarius)','২০ জানুয়ারি – ১৮ ফেব্রুয়ারি'];
+    return ['মীন (Pisces)','১৯ ফেব্রুয়ারি – ২০ মার্চ'];
+  };
+  function calculate(){
+    const birth=parseDate($('birthDate').value);
+    const asOf=parseDate($('asOfDate').value)||new Date(new Date().getFullYear(),new Date().getMonth(),new Date().getDate());
+    const error=$('errorBox'); error.style.display='none';
+    if(!birth){error.textContent='অনুগ্রহ করে জন্ম তারিখ নির্বাচন করুন।';error.style.display='block';return;}
+    if(birth>asOf){error.textContent='জন্ম তারিখ হিসাবের তারিখের পরে হতে পারে না।';error.style.display='block';return;}
+    const a=getAge(birth,asOf);
+    const mode=document.querySelector('input[name="viewMode"]:checked').value;
+    $('ageResult').textContent= mode==='years' ? `${bn(a.years)} বছর` : mode==='days' ? `${bn(a.totalDays)} দিন` : `${bn(a.years)} বছর ${bn(a.months)} মাস ${bn(a.days)} দিন`;
+    $('asOfLabel').textContent=`(${formatDate(asOf)} অনুযায়ী)`;
+    $('totalYears').textContent=bn(a.years);
+    $('totalMonths').textContent=bn(a.totalMonths);
+    $('totalDays').textContent=bn(a.totalDays);
+    let next=clampBirthday(asOf.getFullYear(),birth);
+    if(next<=asOf) next=clampBirthday(asOf.getFullYear()+1,birth);
+    const left=daysBetween(asOf,next);
+    $('nextBirthday').textContent=formatDate(next);
+    $('daysUntil').textContent=left===0?'শুভ জন্মদিন!':`আর ${bn(left)} দিন বাকি`;
+    $('birthWeekday').textContent=weekdays[birth.getDay()];
+    $('birthDateLabel').textContent=`(${formatDate(birth)})`;
+    const z=zodiacData(birth);
+    $('zodiac').textContent=z[0]; $('zodiacDates').textContent=`(${z[1]})`;
+  }
+  $('calculateBtn').addEventListener('click',calculate);
+  $('resetBtn').addEventListener('click',()=>{
+    $('birthDate').value=''; $('asOfDate').value=''; document.querySelector('input[name="viewMode"][value="full"]').checked=true;
+    $('errorBox').style.display='none'; $('ageResult').textContent='—'; $('asOfLabel').textContent='জন্মতারিখ দিয়ে হিসাব করুন';
+    ['totalYears','totalMonths','totalDays','nextBirthday','daysUntil','birthWeekday','birthDateLabel','zodiac','zodiacDates'].forEach(id=>$(id).textContent='—');
+  });
+  $('birthDate').addEventListener('change',calculate);
+  $('asOfDate').addEventListener('change',calculate);
+  document.querySelectorAll('input[name="viewMode"]').forEach(el=>el.addEventListener('change',calculate));
+  async function loadSharedPart(targetId, fileName){
+    const target=$(targetId);
+    try{
+      const response=await fetch(fileName,{cache:'no-cache'});
+      if(!response.ok) throw new Error('HTTP '+response.status);
+      target.innerHTML=await response.text();
+      target.dataset.loaded='true';
+      target.querySelectorAll('script').forEach(oldScript=>{
+        const script=document.createElement('script');
+        for(const attr of oldScript.attributes) script.setAttribute(attr.name,attr.value);
+        script.textContent=oldScript.textContent;
+        oldScript.replaceWith(script);
+      });
+    }catch(err){
+      // Local preview or missing shared files: keep calculator usable without fake header/footer.
+      target.innerHTML='';
+      console.info(`${fileName} লোড হয়নি। ওয়েবসাইটের root-এ ফাইলটি আছে কি না দেখুন।`,err);
+    }
+  }
+  loadSharedPart('site-header','header.html');
+  loadSharedPart('site-footer','footer.html');
+  calculate();
+})();
+</script>
+
+
+<script src="https://eservicebd24.github.io/shared-shell-loader.js" defer=""></script><div id="esbd-footer-slot"></div><script src="https://eservicebd24.github.io/common.js" defer=""></script></body></html>
