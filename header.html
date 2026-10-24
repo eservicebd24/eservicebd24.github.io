@@ -1,28 +1,43 @@
-<!-- eServiceBD24 Shared Header: desktop links + mobile menu, self-contained -->
-<header id="esbd-shared-header" style="box-sizing:border-box;width:100%;background:linear-gradient(100deg,#041632,#062e70 65%,#172bc0);color:#fff;padding:12px clamp(14px,3vw,32px);font-family:Arial,sans-serif;position:relative;z-index:1000;">
+<!-- eServiceBD24 Shared Header -->
+<header id="esbd-shared-header">
   <style>
+    #esbd-shared-header{box-sizing:border-box;width:100%;position:relative;z-index:1000;background:linear-gradient(100deg,#041632,#062e70 65%,#172bc0);color:#fff;font-family:Arial,sans-serif}
     #esbd-shared-header *{box-sizing:border-box}
-    #esbd-shared-header .esbd-header-inner{max-width:1350px;margin:0 auto;display:flex;align-items:center;gap:18px;min-height:44px}
-    #esbd-shared-header .esbd-brand{display:flex;align-items:center;gap:11px;color:#fff;text-decoration:none;font-weight:800;min-width:0;flex-shrink:0}
-    #esbd-shared-header .esbd-logo{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#18c8ff,#087bff);font-size:25px;flex-shrink:0}
-    #esbd-shared-header .esbd-brandtext{font-size:19px;line-height:1.2}
-    #esbd-shared-header .esbd-brandtext small{display:block;font-size:11px;font-weight:500;color:#d8e6ff;margin-top:3px}
-    #esbd-shared-header .esbd-desktop-nav{display:flex;align-items:center;justify-content:flex-end;gap:3px;margin-left:auto}
-    #esbd-shared-header .esbd-desktop-nav a,#esbd-shared-header .esbd-mobile-nav a{display:block;color:#fff;text-decoration:none;padding:10px 12px;border-radius:8px;font-size:14px;font-weight:700;white-space:nowrap}
+    #esbd-shared-header .esbd-header-inner{width:100%;max-width:1350px;min-height:68px;margin:0 auto;padding:10px clamp(14px,3vw,32px);display:flex;align-items:center;gap:18px}
+    #esbd-shared-header .esbd-brand{display:flex;align-items:center;gap:11px;min-width:0;flex:0 1 auto;color:#fff;text-decoration:none;font-weight:800}
+    #esbd-shared-header .esbd-logo{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;flex:0 0 42px;background:linear-gradient(135deg,#18c8ff,#087bff);font-size:25px}
+    #esbd-shared-header .esbd-brandtext{font-size:19px;line-height:1.2;white-space:nowrap}
+    #esbd-shared-header .esbd-brandtext small{display:block;font-size:11px;font-weight:500;color:#d8e6ff;margin-top:3px;white-space:normal}
+    #esbd-shared-header .esbd-desktop-nav{display:flex;align-items:center;justify-content:flex-end;gap:2px;margin-left:auto;flex:0 0 auto}
+    #esbd-shared-header .esbd-desktop-nav a{display:inline-flex;align-items:center;gap:5px;color:#fff;text-decoration:none;padding:10px 11px;border-radius:8px;font-size:13px;font-weight:700;white-space:nowrap}
     #esbd-shared-header .esbd-desktop-nav a:hover,#esbd-shared-header .esbd-mobile-nav a:hover{background:#ffffff20}
-    #esbd-shared-header .esbd-mobile-menu{display:none;position:relative;margin-left:auto}
-    #esbd-shared-header .esbd-menu-button{border:1px solid #ffffff66;background:#ffffff12;color:#fff;border-radius:9px;padding:10px 13px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap}
-    #esbd-shared-header .esbd-mobile-nav{display:none;position:absolute;right:0;top:calc(100% + 8px);min-width:200px;background:#101b3b;border:1px solid #ffffff30;border-radius:12px;padding:7px;box-shadow:0 12px 30px #0005}
-    #esbd-shared-header .esbd-mobile-menu[open] .esbd-mobile-nav{display:block}
+    #esbd-shared-header .esbd-mobile-menu{display:none;position:relative;margin-left:auto;flex:0 0 auto}
+    #esbd-shared-header .esbd-menu-button{display:inline-flex;align-items:center;justify-content:center;border:1px solid #ffffff66;background:#ffffff12;color:#fff;border-radius:9px;padding:10px 13px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap}
     #esbd-shared-header .esbd-mobile-menu summary{list-style:none}
     #esbd-shared-header .esbd-mobile-menu summary::-webkit-details-marker{display:none}
+    #esbd-shared-header .esbd-mobile-nav{display:none;position:absolute;top:calc(100% + 9px);right:0;width:220px;max-width:calc(100vw - 24px);padding:7px;background:#101b3b;border:1px solid #ffffff35;border-radius:12px;box-shadow:0 12px 30px #0005;z-index:10010}
+    #esbd-shared-header .esbd-mobile-menu[open] .esbd-mobile-nav{display:block}
+    #esbd-shared-header .esbd-mobile-nav a{display:flex;align-items:center;gap:9px;color:#fff;text-decoration:none;padding:11px 12px;border-radius:8px;font-size:14px;font-weight:700}
+    @media(min-width:761px){
+      #esbd-shared-header .esbd-desktop-nav{display:flex!important}
+      #esbd-shared-header .esbd-mobile-menu{display:none!important}
+    }
     @media(max-width:760px){
-      #esbd-shared-header{padding:10px 13px!important}
-      #esbd-shared-header .esbd-header-inner{gap:9px}
-      #esbd-shared-header .esbd-brandtext{font-size:16px}
-      #esbd-shared-header .esbd-logo{width:39px;height:39px;font-size:23px}
+      #esbd-shared-header .esbd-header-inner{min-height:64px;padding:9px 13px;gap:8px}
+      #esbd-shared-header .esbd-logo{width:39px;height:39px;flex-basis:39px;font-size:23px}
+      #esbd-shared-header .esbd-brand{gap:9px}
+      #esbd-shared-header .esbd-brandtext{font-size:clamp(14px,4vw,17px)}
+      #esbd-shared-header .esbd-brandtext small{font-size:10px}
       #esbd-shared-header .esbd-desktop-nav{display:none!important}
       #esbd-shared-header .esbd-mobile-menu{display:block!important}
+      #esbd-shared-header .esbd-menu-button{padding:10px 12px;font-size:14px}
+    }
+    @media(max-width:360px){
+      #esbd-shared-header .esbd-header-inner{padding-left:9px;padding-right:9px}
+      #esbd-shared-header .esbd-brandtext{font-size:13px}
+      #esbd-shared-header .esbd-brandtext small{font-size:9px}
+      #esbd-shared-header .esbd-logo{width:34px;height:34px;flex-basis:34px}
+      #esbd-shared-header .esbd-menu-button{padding:9px;font-size:12px}
     }
   </style>
   <div class="esbd-header-inner">
