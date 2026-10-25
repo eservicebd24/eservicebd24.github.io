@@ -1,0 +1,1147 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Desktop M3U Player</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1020;--panel:#121a2d;--line:#26334d;--text:#edf3ff;--muted:#9eacc6;--accent:#48d6a0;--blue:#6ca8ff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#172544,#0b1020 55%);color:var(--text);font:15px/1.5 "Segoe UI",Arial,sans-serif;min-height:100vh}
+.wrap{max-width:1240px;margin:auto;padding:24px}.top{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--blue));display:grid;place-items:center;color:#07131a;font-weight:900;font-size:18px}
+h1{font-size:24px;margin:0}.sub{color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(280px,1fr);gap:18px}
+.panel{background:rgba(18,26,45,.94);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:0 18px 45px #0003}
+.controls{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:12px}.urlrow{display:flex;gap:8px;width:100%}
+input[type=text]{min-width:0;flex:1;background:#080e1b;border:1px solid var(--line);border-radius:10px;padding:12px;color:var(--text);outline:none}
+input[type=text]:focus{border-color:var(--blue)}button,.filebtn{border:1px solid #334461;background:#1b2943;color:var(--text);border-radius:10px;padding:10px 13px;cursor:pointer;font-weight:650;display:inline-flex;align-items:center;justify-content:center;gap:7px}
+button:hover,.filebtn:hover{filter:brightness(1.18)}button.primary{background:var(--accent);border-color:var(--accent);color:#062017}button:disabled{opacity:.45;cursor:not-allowed}
+.filebtn input{display:none}.drop{border:1px dashed #526687;border-radius:12px;padding:16px;text-align:center;color:var(--muted);font-size:13px;margin-bottom:12px;cursor:pointer;transition:background .15s,border-color .15s}.drop:hover,.drop:focus{border-color:var(--accent);background:#48d6a012;outline:none}.drop.over{border-color:var(--accent);background:#48d6a012}
+video{display:block;width:100%;aspect-ratio:16/9;background:#02040a;border-radius:12px;object-fit:contain}
+.status{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px;margin-top:11px;min-height:22px}.dot{width:8px;height:8px;border-radius:50%;background:#7c8ba7}.dot.good{background:var(--accent)}.dot.bad{background:#ff7272}
+h2{font-size:16px;margin:0 0 12px}.sidehead{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.search{width:100%;margin-bottom:10px}.channels{max-height:490px;overflow:auto;display:flex;flex-direction:column;gap:6px}
+.channel{display:flex;align-items:center;gap:10px;text-align:left;width:100%;padding:10px;background:#0c1425;border:1px solid transparent;font-weight:500}.channel.active{border-color:var(--accent);background:#17352f}.num{font-size:11px;color:var(--muted);min-width:24px}.cname{overflow-wrap:anywhere;flex:1}.empty{color:var(--muted);text-align:center;padding:28px 10px}
+.note{color:var(--muted);font-size:12px;margin-top:12px}.bottom{color:var(--muted);font-size:12px;margin:16px 2px 0}.actions{display:flex;gap:8px;flex-wrap:wrap}
+body.light{color-scheme:light;--bg:#f3f6fb;--panel:#ffffff;--line:#d4dce8;--text:#152238;--muted:#52627a;--accent:#087f5b;--blue:#2563eb;background:linear-gradient(135deg,#f6f8fc,#e9eef7);color:var(--text)}
+body.light .panel{background:rgba(255,255,255,.97);border-color:#d4dce8;box-shadow:0 14px 36px rgba(30,50,80,.09)}
+body.light input[type=text],body.light input[type=number],body.light .channel,body.light .toolrow select{background:#fff;color:#152238;border-color:#cbd5e1}
+body.light input::placeholder{color:#78869a;opacity:1}
+body.light button,body.light .filebtn{background:#f1f5f9;color:#17263d;border-color:#cbd5e1}
+body.light button.primary{background:#087f5b;color:#fff;border-color:#087f5b}
+body.light .channel.active{background:#dff7ed;border-color:#087f5b;color:#12352b}
+body.light .drop{color:#52627a;border-color:#a8b6ca}
+body.light .status,body.light .note,body.light .sub,body.light .bottom,body.light .small-setting{color:#52627a}
+body.light .health-pill{background:#e2e8f0;color:#24354d}
+body.light .logo{color:#fff}
+body.light .toolrow select option{background:#fff;color:#152238}
+body.light .health-report{color:#334155}
+body.light .empty{color:#64748b}
+body.light .favmark{color:#a16207}
+.advanced-tools{margin-top:12px;border-top:1px solid var(--line);padding-top:12px;display:grid;gap:8px}
+.toolrow{display:flex;gap:6px;flex-wrap:wrap}.toolrow button,.toolrow select{font-size:12px;padding:8px;min-width:0;flex:1}
+.toolrow select{background:#0c1425;color:var(--text);border:1px solid var(--line);border-radius:9px}
+body.light .toolrow select{background:#f3f6fb;color:#172033}
+.small-setting{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px}.small-setting input{width:55px;background:#0c1425;color:var(--text);border:1px solid var(--line);border-radius:7px;padding:6px}
+.health-pill{font-size:10px;border-radius:6px;padding:2px 5px;background:#28384e;color:#cbd5e1}.health-report{font-size:12px;color:var(--muted);max-height:140px;overflow:auto;white-space:pre-wrap}
+.channel .favmark{color:#ffd166;margin-left:auto;padding-left:6px}
+.copyright{text-align:center;color:var(--muted);font-size:11px;padding:10px 0 2px;letter-spacing:.06em}
+.copyright strong{color:var(--text);font-weight:750}
+/* Color-coded controls and channel selection */
+.toolrow button{border-width:1px;border-style:solid}
+#savePlaylistBtn{background:#164e63;border-color:#0891b2;color:#e0faff}
+#favoritesBtn{background:#713f12;border-color:#f59e0b;color:#fff7d6}
+#historyBtn{background:#4338ca;border-color:#818cf8;color:#eef2ff}
+#dedupeBtn{background:#7f1d1d;border-color:#f87171;color:#fff1f2}
+#healthBtn{background:#14532d;border-color:#4ade80;color:#dcfce7}
+#retryFailedBtn{background:#7c2d12;border-color:#fb923c;color:#fff7ed}
+#editChannelBtn{background:#581c87;border-color:#c084fc;color:#faf5ff}
+#compareBtn{background:#164e63;border-color:#22d3ee;color:#ecfeff}
+#exportCategoryBtn{background:#1e40af;border-color:#60a5fa;color:#eff6ff}
+#exportCsvBtn{background:#166534;border-color:#4ade80;color:#f0fdf4}
+#exportTxtBtn{background:#854d0e;border-color:#facc15;color:#fefce8}
+#exportAllBtn{background:#3730a3;border-color:#a5b4fc;color:#eef2ff}
+#exportGoodBtn{background:#166534;border-color:#4ade80;color:#f0fdf4}
+#exportBadBtn{background:#991b1b;border-color:#f87171;color:#fff1f2}
+#pipBtn{background:#0e7490;border-color:#67e8f9;color:#ecfeff}
+#themeSelect{border-color:#c084fc}
+#healthFilter{border-color:#f59e0b}
+#categoryFilter{border-color:#34d399}
+#exportCategory{border-color:#60a5fa}
+#audioSelect{border-color:#f472b6}#subtitleSelect{border-color:#a78bfa}
+body.light .toolrow button{filter:saturate(.9);box-shadow:0 2px 5px #0f172a12}
+.selection-tools{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin:8px 0 10px;padding:10px;border:1px solid var(--line);border-radius:12px;background:rgba(127,145,170,.07)}
+.selection-tools button{font-size:12px;padding:8px 10px}
+#selectVisibleBtn{background:#075985;border-color:#38bdf8;color:#f0f9ff}
+#clearSelectionBtn{background:#7f1d1d;border-color:#f87171;color:#fff1f2}
+#createSelectedBtn{background:#166534;border-color:#4ade80;color:#f0fdf4}
+.select-count{font-size:12px;font-weight:800;color:#34d399;margin-left:auto}
+.channel-check{width:17px;height:17px;flex:0 0 auto;accent-color:#22c55e;cursor:pointer}
+.channel.selected{border-color:#22c55e;background:rgba(34,197,94,.13)}
+.channel.selected .num{color:#4ade80;font-weight:800}
+body.light .channel.selected{background:#dcfce7;border-color:#16a34a;color:#14532d}
+body.light #savePlaylistBtn,body.light #favoritesBtn,body.light #historyBtn,body.light #dedupeBtn,body.light #healthBtn,body.light #retryFailedBtn,body.light #editChannelBtn,body.light #compareBtn,body.light #exportCategoryBtn,body.light #exportCsvBtn,body.light #exportTxtBtn,body.light #exportAllBtn,body.light #exportGoodBtn,body.light #exportBadBtn,body.light #pipBtn,body.light #selectVisibleBtn,body.light #clearSelectionBtn,body.light #createSelectedBtn{color:#fff}
+select option{padding:6px}
+#healthFilter option[value="all"]{background:#334155;color:#fff}
+#healthFilter option[value="reachable"]{background:#166534;color:#fff}
+#healthFilter option[value="error"]{background:#991b1b;color:#fff}
+#healthFilter option[value="unknown"]{background:#92400e;color:#fff}
+#themeSelect option[value="dark"]{background:#172554;color:#fff}#themeSelect option[value="light"]{background:#e0f2fe;color:#0c4a6e}
+@media(max-width:500px){.selection-tools{gap:6px}.select-count{width:100%;margin-left:0}}
+/* SC Android Studio — professional visual refinement */
+:root{--accent:#42d6a0;--blue:#75aaff}
+body{font-family:Inter,"Segoe UI",system-ui,Arial,sans-serif;letter-spacing:.01em}
+.wrap{max-width:1400px;padding:28px}
+.top{padding:18px 20px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(135deg,rgba(24,38,63,.94),rgba(15,23,42,.96));box-shadow:0 18px 50px #0002}
+body.light .top{background:linear-gradient(135deg,#fff,#eef4fb);box-shadow:0 12px 32px rgba(30,50,80,.08)}
+h1{font-size:clamp(23px,2vw,30px);font-weight:800;letter-spacing:-.035em}
+h2{font-size:15px;letter-spacing:.02em;font-weight:750}
+.panel{border-radius:20px;padding:20px;box-shadow:0 16px 44px #0002}
+button,.filebtn{transition:transform .15s ease,box-shadow .15s ease,background .15s ease;border-radius:11px;font-size:13px}
+button:hover,.filebtn:hover{transform:translateY(-1px);box-shadow:0 6px 18px #0002}
+button:active,.filebtn:active{transform:translateY(0)}
+button.primary{box-shadow:0 5px 16px #48d6a025}
+input[type=text],input[type=number],.toolrow select{min-height:40px;border-radius:11px}
+.drop{border-width:2px;border-radius:14px;padding:18px;background:rgba(108,168,255,.035);font-weight:600}
+video{border:1px solid var(--line);box-shadow:0 12px 30px #0002}
+.channels{gap:7px}
+.channel{border-radius:11px;padding:11px 12px}
+.channel.active{box-shadow:inset 3px 0 var(--accent)}
+.advanced-tools{gap:10px}
+.toolrow{gap:8px}
+.health-report{padding:10px 12px;border-radius:10px;background:rgba(127,145,170,.08);line-height:1.65}
+.bottom{text-align:center;padding:12px}
+.brand .logo{box-shadow:0 8px 20px #0002}
+@media(max-width:850px){.grid{grid-template-columns:1fr}.wrap{padding:14px}.channels{max-height:320px}.urlrow{flex-wrap:wrap}.urlrow input{flex-basis:100%}}
+
+/* Marked playlist builder modal */
+.modal-backdrop{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(2,6,23,.72);backdrop-filter:blur(7px)}
+.modal-backdrop.open{display:flex}.builder-modal{width:min(100%,470px);background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:0 28px 90px #0008;animation:modalIn .18s ease-out}
+@keyframes modalIn{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+.modal-title{display:flex;align-items:center;gap:12px;margin-bottom:6px}.modal-icon{width:44px;height:44px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(135deg,#16a34a,#0e7490);font-size:21px}
+.modal-sub{font-size:13px;color:var(--muted);margin:0 0 18px}.field-label{display:block;font-size:12px;font-weight:800;letter-spacing:.04em;margin:13px 0 6px;color:var(--muted)}
+.builder-modal input{width:100%;min-width:0;flex:none;background:#080e1b;color:var(--text);border:1px solid var(--line);border-radius:11px;padding:12px;outline:none}
+.builder-modal input:focus{border-color:#22c55e;box-shadow:0 0 0 3px #22c55e22}.modal-hint{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5}.modal-count{display:inline-flex;border-radius:99px;padding:5px 10px;background:#14532d;color:#dcfce7;font-size:12px;font-weight:800;margin:8px 0 2px}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}.modal-actions button{min-width:100px;padding:11px 14px}.modal-cancel{background:#475569!important;border-color:#64748b!important;color:white!important}.modal-save{background:#15803d!important;border-color:#4ade80!important;color:white!important}
+body.light .builder-modal input{background:#fff;color:#152238;border-color:#cbd5e1}body.light .modal-hint{color:#52627a}
+.channel-logo{width:36px;height:36px;flex:0 0 36px;object-fit:contain;border-radius:8px;background:#fff;padding:3px;border:1px solid #ffffff22}.channel-logo-fallback{width:36px;height:36px;flex:0 0 36px;display:grid;place-items:center;border-radius:8px;background:#26354d;color:#cbd5e1;font-size:11px;font-weight:900}
+body.light .channel-logo-fallback{background:#e2e8f0;color:#334155}
+@media(max-height:800px){.wrap{padding:12px}.top{margin-bottom:10px;padding:12px 16px}.panel{padding:13px}.channels{max-height:260px}.advanced-tools{gap:6px;margin-top:8px;padding-top:8px}.toolrow{gap:5px}.toolrow button,.toolrow select{padding:7px;font-size:11px}.selection-tools{padding:7px;margin:6px 0}.drop{padding:10px}video{max-height:42vh}}
+
+
+/* ===== SC Android Studio: polished colorful dashboard redesign ===== */
+:root{color-scheme:light;--bg:#eef3fb;--panel:#fff;--line:#d8e2f0;--text:#10245c;--muted:#52658e;--accent:#0866f5;--blue:#0866f5}
+body{background:linear-gradient(135deg,#f5f8ff 0%,#eaf1fb 100%);color:#10245c;font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:13px}
+.wrap{max-width:1800px;padding:14px 18px;margin:0 auto}
+.top{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-bottom:1px solid #dbe4f2;margin:-14px -18px 12px;padding:12px 20px;gap:14px}
+.brand{gap:12px}.logo{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#087bff,#04b9d3);color:#fff;box-shadow:0 5px 14px #087bff35;font-size:13px}h1{font-size:24px;letter-spacing:-.5px;color:#0c1d62}.sub{color:#53658d;font-size:12px}
+.top .actions{gap:8px}.top .actions button,.top .actions .filebtn{background:#0b6bfa;color:white;border-color:#0b6bfa;border-radius:9px;padding:10px 15px;box-shadow:0 3px 8px #0b6bfa22}
+.grid{grid-template-columns:minmax(0,1.55fr) minmax(420px,1fr);gap:14px;align-items:start}
+.panel{background:#fff;border:1px solid #d9e3f1;border-radius:13px;padding:13px;box-shadow:0 3px 12px rgba(35,66,120,.055)}
+h2{font-size:15px;color:#10245c;margin-bottom:9px}.controls{margin-bottom:8px}.urlrow{gap:8px}.urlrow input{min-height:43px}input[type=text],input[type=number],select{background:#fff;color:#14285f;border:1px solid #cbd8eb;border-radius:9px;padding:10px 11px;font:inherit;min-height:38px}input::placeholder{color:#7383a5}
+button,.filebtn{border:1px solid #d0dced;background:#f7f9fd;color:#17295b;border-radius:9px;padding:9px 11px;font-size:12px;font-weight:750;box-shadow:0 1px 2px #10245c0b;transition:transform .12s,filter .12s}button:hover,.filebtn:hover{filter:brightness(1.05);transform:translateY(-1px)}button.primary{background:#009b45;border-color:#009b45;color:#fff}
+.drop{padding:10px;margin-bottom:10px;border:2px dashed #b7c9e4;color:#52658e;background:#f8fbff;border-radius:11px}
+video{aspect-ratio:16/9;min-height:390px;max-height:62vh;background:#080b12;border-radius:10px;box-shadow:0 8px 18px #12244a20}
+.status{font-size:12px;color:#425984;margin-top:9px}.note{font-size:11px;color:#637497;margin-top:8px}.bottom{font-size:11px;color:#637497}.copyright{text-align:center;color:#637497;font-size:11px;margin-top:8px}
+.sidehead{margin-bottom:8px}.channels{max-height:clamp(310px,44vh,560px);gap:5px;padding-right:2px}.channel{background:#fff;border:1px solid #d6e0ef;border-radius:10px;padding:11px 9px;color:#162957;gap:10px;min-height:48px}.channel:hover{background:#f1f7ff;border-color:#9fc4ff}.channel.active{background:#e0efff;border:1px solid #9bc5ff;color:#10245c}.channel input[type=checkbox]{width:17px;height:17px;accent-color:#087bff;flex:0 0 auto}.num{color:#596b91}.cname{font-size:13px}.selection-tools{display:grid;grid-template-columns:1fr 1fr 1.3fr auto;gap:7px;align-items:center;padding:9px;background:#f7faff;border:1px solid #dce6f4;border-radius:11px;margin-bottom:8px}.select-count{font-size:11px;color:#00a66a;font-weight:800;white-space:nowrap}
+/* Color-coded controls */
+#selectVisibleBtn{background:#087db8;color:#fff;border-color:#087db8}#clearSelectionBtn{background:#c3222b;color:#fff;border-color:#c3222b}#createSelectedBtn{background:#07813b;color:#fff;border-color:#07813b}
+.advanced-tools{border-top:1px solid #dce5f2;margin-top:9px;padding-top:9px}.toolrow{display:flex;gap:6px;align-items:center;margin:6px 0;flex-wrap:nowrap}.toolrow>*{min-width:0;flex:1}.toolrow button{min-height:36px;line-height:1.15}.toolrow select{font-size:11px;min-width:0;padding:8px}.toolrow input[type=number]{width:58px;min-height:34px;padding:6px}.small-setting{font-size:11px;color:#586b90;display:flex;align-items:center;gap:5px;white-space:nowrap;flex:0 0 auto}
+#savePlaylistBtn{background:#155e75;color:#fff;border-color:#155e75}#favoritesBtn{background:#8b4b00;color:#fff;border-color:#8b4b00}#historyBtn{background:#4835c8;color:#fff;border-color:#4835c8}#dedupeBtn{background:#a52323;color:#fff;border-color:#a52323}#healthBtn{background:#087a3c;color:#fff;border-color:#087a3c}#retryFailedBtn{background:#85310f;color:#fff;border-color:#85310f}#editChannelBtn{background:#6423a3;color:#fff;border-color:#6423a3}#compareBtn{background:#155e75;color:#fff;border-color:#155e75}#exportCategoryBtn,#exportAllBtn{background:#273fba;color:#fff;border-color:#273fba}#exportCsvBtn,#exportGoodBtn{background:#07813b;color:#fff;border-color:#07813b}#exportTxtBtn{background:#a66a00;color:#fff;border-color:#a66a00}#exportBadBtn{background:#b4232b;color:#fff;border-color:#b4232b}#pipBtn{background:#087b98;color:#fff;border-color:#087b98}
+.health-report{color:#34486e;font-size:11px}.health-pill{background:#e7edf7;color:#34486e}.empty{color:#7182a1}
+body:not(.light){color-scheme:light;background:linear-gradient(135deg,#f5f8ff,#eaf1fb);color:#10245c}body:not(.light) .panel{background:#fff;border-color:#d9e3f1}body:not(.light) input[type=text],body:not(.light) input[type=number],body:not(.light) select,body:not(.light) .channel{background:#fff;color:#14285f;border-color:#cbd8eb}body:not(.light) .channel.active{background:#e0efff;color:#10245c}body:not(.light) .top{background:rgba(255,255,255,.94)}
+@media(max-width:1050px){.grid{grid-template-columns:minmax(0,1fr)}.channels{max-height:360px}video{min-height:280px}.top{position:static}.selection-tools{grid-template-columns:1fr 1fr}.select-count{text-align:center}}
+@media(max-width:600px){.wrap{padding:9px}.top{margin:-9px -9px 9px;padding:10px;align-items:flex-start}.brand h1{font-size:20px}.grid{gap:9px}.panel{padding:10px}.toolrow{flex-wrap:wrap}.toolrow>*{flex:1 1 42%}.urlrow{flex-wrap:wrap}.urlrow input{flex:1 1 100%}video{min-height:220px}.selection-tools{grid-template-columns:1fr 1fr}.selection-tools button{font-size:11px}}
+
+
+/* Reference-dashboard redesign: compact navigation, larger player, bright category-coded controls */
+:root{
+ --bg:#edf3fc;--panel:#fff;--line:#d8e2f0;--text:#0b1b59;--muted:#425781;
+ --accent:#087fdb;--blue:#2563eb;
+}
+body,body.light{color-scheme:light;background:linear-gradient(135deg,#f7faff,#eaf1fb);color:#0b1b59}
+.wrap{max-width:1800px;width:100%;padding:12px 18px 8px}
+.top{position:sticky;top:0;z-index:20;display:flex;gap:14px;align-items:center;justify-content:space-between;margin:0 0 10px;padding:8px 10px;border:1px solid #dce5f3;border-radius:14px;background:rgba(255,255,255,.96);box-shadow:0 4px 16px #24406b12}
+.brand{gap:10px;min-width:265px}
+.logo{width:46px;height:46px;border-radius:10px;background:linear-gradient(135deg,#0b82f6,#08b4c6);color:white;font-size:16px;box-shadow:0 3px 10px #1685e833}
+h1{font-size:clamp(20px,1.8vw,28px);font-weight:850;letter-spacing:-.04em;color:#07175c}
+.sub{color:#415783;font-size:12px}
+.top .actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.top .actions button,.top .actions .filebtn{min-height:40px;padding:9px 14px;color:white;border:0;border-radius:9px;box-shadow:0 3px 8px #0b1b5920}
+.top .actions .filebtn{background:linear-gradient(135deg,#0868ed,#148dff)}
+#clearBtn{background:linear-gradient(135deg,#c51f2d,#ef4444);color:#fff}
+.grid{grid-template-columns:minmax(0,1.55fr) minmax(390px,.98fr);gap:14px;align-items:start}
+.panel{min-width:0;background:#fff;border:1px solid #d9e4f2;border-radius:14px;padding:12px;box-shadow:0 3px 14px #19345e0c}
+h2{color:#0b1b59;font-size:15px;font-weight:800;margin-bottom:8px}
+.controls{margin-bottom:8px}
+.urlrow{gap:8px}
+input[type=text],input[type=number],.toolrow select{background:#fff;color:#172b55;border:1px solid #cbd8eb;border-radius:9px}
+input[type=text]{padding:11px 12px}
+input::placeholder{color:#63769a;opacity:1}
+button,.filebtn{font-size:12px;border-radius:9px;padding:9px 11px;box-shadow:0 2px 5px #18345b12}
+button.primary{background:linear-gradient(135deg,#009b45,#0aaf51);border-color:#0a9e4a;color:#fff}
+.drop{padding:10px;margin-bottom:10px;border:2px dashed #a7bddb;background:#f9fbff;color:#3d5681;border-radius:10px}
+video{aspect-ratio:16/9;max-height:none;width:100%;background:#101010;border-radius:10px;box-shadow:0 8px 20px #10234720}
+.status{margin-top:8px;color:#35537d}
+.note{font-size:11px;color:#50658a;margin-top:8px}
+.sidehead{padding:2px 2px 7px}
+.search{margin-bottom:8px;width:100%}
+.selection-tools{margin:0 0 8px;padding:8px;gap:7px;border-radius:10px;background:#f6f9ff;border-color:#d6e2f3}
+.selection-tools button{font-size:11px;padding:8px 9px}
+#selectVisibleBtn{background:#0877c9;border-color:#4eb4ff;color:white}
+#clearSelectionBtn{background:#b91c1c;border-color:#f87171;color:white}
+#createSelectedBtn{background:#087d37;border-color:#40cf77;color:white}
+.select-count{font-size:11px;color:#0bbf87}
+.channels{max-height:clamp(250px,40vh,470px);gap:4px;padding-right:2px}
+.channel{min-height:48px;padding:8px 9px;gap:9px;border:1px solid #dce5f1;border-radius:10px;background:#fff;color:#16274b}
+.channel:hover{background:#f2f7ff;border-color:#a9c9f4}
+.channel.active,.channel.selected{background:#e2f0ff;border-color:#8fc4ff;color:#102d69}
+.channel.selected .num{color:#087fdb}
+.num{color:#637697}
+.health-pill{background:#e5edf7;color:#35496b}
+.advanced-tools{margin-top:8px;padding-top:8px;gap:7px;border-top-color:#d8e3f2}
+.toolrow{gap:6px}
+.toolrow button,.toolrow select{font-size:11px;padding:8px 7px;border-radius:9px}
+.small-setting{font-size:10px;color:#4e6388}
+.small-setting input{background:#fff;color:#18345e;border-color:#cad7e9}
+#savePlaylistBtn{background:#075985;border-color:#0891b2;color:#fff}
+#favoritesBtn{background:#854d0e;border-color:#f59e0b;color:#fff}
+#historyBtn{background:#4338ca;border-color:#818cf8;color:#fff}
+#dedupeBtn{background:#b91c1c;border-color:#f87171;color:#fff}
+#healthBtn{background:#15803d;border-color:#4ade80;color:#fff}
+#retryFailedBtn{background:#9a3412;border-color:#fb923c;color:#fff}
+#editChannelBtn{background:#6b21a8;border-color:#c084fc;color:#fff}
+#compareBtn{background:#155e75;border-color:#22d3ee;color:#fff}
+#exportCategoryBtn{background:#1d4ed8;border-color:#60a5fa;color:#fff}
+#exportCsvBtn{background:#15803d;border-color:#4ade80;color:#fff}
+#exportTxtBtn{background:#b45309;border-color:#facc15;color:#fff}
+#exportAllBtn{background:#3730a3;border-color:#a5b4fc;color:#fff}
+#exportGoodBtn{background:#166534;border-color:#4ade80;color:#fff}
+#exportBadBtn{background:#b91c1c;border-color:#f87171;color:#fff}
+#pipBtn{background:#0e7490;border-color:#67e8f9;color:#fff}
+#themeSelect,#healthFilter,#categoryFilter,#exportCategory,#audioSelect,#subtitleSelect{border:1px solid #c9d8ee;background:#f8fbff;color:#20375f}
+body.light .panel{background:#fff;border-color:#d9e4f2;box-shadow:0 3px 14px #19345e0c}
+body.light .toolrow select,body.light input[type=text],body.light input[type=number],body.light .small-setting input{background:#fff;color:#172b55;border-color:#cbd8eb}
+body.light .channel{background:#fff;color:#16274b;border-color:#dce5f1}
+body.light .channel.active,body.light .channel.selected{background:#e2f0ff;border-color:#8fc4ff;color:#102d69}
+body.light .drop{background:#f9fbff;color:#3d5681}
+body.light .status,body.light .note,body.light .sub,body.light .bottom{color:#50658a}
+body.light .top{background:rgba(255,255,255,.96)}
+body.light .top .actions button,body.light .top .actions .filebtn{color:#fff}
+.health-report{color:#50658a}
+.bottom{font-size:11px;color:#53698e;margin-top:10px}
+.copyright{color:#53698e;padding:6px 0 2px}
+.copyright strong{color:#10245e}
+@media(min-width:1500px){.grid{grid-template-columns:minmax(0,1.58fr) minmax(440px,.98fr)}}
+@media(max-width:1000px){.wrap{padding:8px}.top{position:static}.grid{grid-template-columns:1fr}.channels{max-height:45vh}.brand{min-width:0}}
+@media(max-width:560px){.top{align-items:flex-start}.top .actions{width:100%}.top .actions>*{flex:1}.panel{padding:10px}.urlrow{flex-wrap:wrap}.urlrow input{flex-basis:100%}.selection-tools button{flex:1}.toolrow>*{min-width:calc(50% - 6px)}}
+
+
+/* ===== Screenshot-matched dashboard layout ===== */
+:root{color-scheme:light;--bg:#edf3fb;--panel:#fff;--line:#d9e3f1;--text:#0b1b59;--muted:#52658c}
+body,body.light,body:not(.light){background:linear-gradient(135deg,#f7faff,#eaf1fb);color:#0b1b59;color-scheme:light;font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:13px}
+.wrap{width:100%;max-width:1900px;padding:12px 18px 8px}
+.top{position:relative;top:auto;margin:0 0 10px;padding:9px 12px;background:#fff;border:1px solid #d9e4f2;border-radius:14px;box-shadow:0 3px 12px #1e3a5f0b}
+.brand{gap:10px}.logo{width:46px;height:46px;border-radius:11px;background:linear-gradient(135deg,#087bff,#08b7cc);color:#fff}
+h1{font-size:clamp(21px,1.8vw,28px);color:#0b1b59;font-weight:850;letter-spacing:-.04em}
+.sub,.note,.bottom{color:#52658c}
+.top .actions{gap:8px}.top .actions button,.top .actions .filebtn{background:#086bfa;color:#fff;border:1px solid #086bfa;border-radius:9px;padding:10px 14px}.top .actions #clearBtn{background:#d92532;border-color:#d92532}
+.grid{display:grid;grid-template-columns:minmax(0,1.58fr) minmax(420px,1fr);gap:14px;align-items:start}
+.grid>main{min-width:0;background:transparent;border:0;padding:0;box-shadow:none;display:flex;flex-direction:column;gap:9px}
+.dashboard-right{display:flex;flex-direction:column;gap:10px;min-width:0}
+.panel{min-width:0;background:#fff!important;border:1px solid #d9e3f1!important;border-radius:13px!important;padding:12px!important;box-shadow:0 3px 12px #2344770b!important}
+h2{font-size:15px;color:#0b1b59;margin:0 0 8px;font-weight:800}
+.controls{margin-bottom:8px}.urlrow input{min-height:43px}.drop{padding:10px;margin-bottom:9px;background:#f8fbff;border:2px dashed #b5c8e3;color:#53658c;border-radius:10px}
+video{width:100%;aspect-ratio:16/9;min-height:410px;max-height:68vh;background:#080b12;border-radius:10px;box-shadow:0 8px 18px #12244a22;object-fit:contain}
+.status{color:#425984;margin-top:7px}.note{font-size:11px;margin-top:6px}
+.channel-filters{display:grid;grid-template-columns:minmax(0,1fr) 155px;gap:8px}
+.channel-filters>*{min-width:0;width:100%}.search{margin:0;min-width:0}
+input[type=text],input[type=number],select{background:#fff!important;color:#14285f!important;border:1px solid #cbd8eb!important;border-radius:9px!important;min-height:38px;padding:9px 10px;font:inherit}
+input::placeholder{color:#7182a4!important;opacity:1}
+.status-filters{display:flex;gap:7px;margin:8px 0;align-items:center}.status-filters select{flex:1;min-width:0}.filter-chip{padding:7px 10px;border-radius:8px;font-size:11px;font-weight:800;white-space:nowrap}.all-chip{background:#e0efff;color:#0872c9;border:1px solid #91c7ff}.fav-chip{background:#eee7ff;color:#6734c8;border:1px solid #c6b3ff}
+.selection-tools{display:grid;grid-template-columns:1fr 1fr 1.3fr auto;gap:6px;align-items:center;margin:0 0 8px;padding:8px;background:#f7faff;border:1px solid #dce6f4;border-radius:10px}
+.selection-tools button{padding:8px 7px;font-size:11px;min-width:0}
+#selectVisibleBtn{background:#087dcc!important;border-color:#087dcc!important;color:#fff!important}#clearSelectionBtn{background:#c21e28!important;border-color:#c21e28!important;color:#fff!important}#createSelectedBtn{background:#087d39!important;border-color:#087d39!important;color:#fff!important}
+.select-count{font-size:11px;color:#00a66a;font-weight:850;white-space:nowrap}
+.channels{max-height:clamp(310px,43vh,550px);overflow:auto;gap:4px;padding-right:2px}
+.channel{display:flex;align-items:center;gap:9px;min-height:48px;padding:8px 9px;background:#fff!important;color:#172957!important;border:1px solid #d9e3f1!important;border-radius:10px;font-size:13px}
+.channel:hover{background:#f2f7ff!important;border-color:#9dc5fb!important}.channel.active,.channel.selected{background:#e2f0ff!important;border-color:#91c4ff!important;color:#10245c!important}
+.channel .num{color:#63769a}.channel-logo{width:30px;height:30px;flex:0 0 30px;object-fit:contain;border-radius:5px;background:#fff;padding:2px}.channel-logo-fallback{width:30px;height:30px;flex:0 0 30px}
+.health-pill{background:#e5edf7;color:#35496b}.channel:has(.health-pill) .health-pill{font-size:10px}
+.current-playlist,.channel-actions,.export-tools{padding:11px!important}
+.section-title{display:flex;align-items:center;gap:9px;margin-bottom:8px}.section-title h2{margin:0}.section-icon{display:grid;place-items:center;width:31px;height:31px;border-radius:8px;font-size:20px;font-weight:900}.section-icon.blue{background:#e0efff;color:#087bdb}.section-icon.orange{background:#fff0d8;color:#c26b00}.section-icon.teal{background:#dff7f7;color:#087f98}
+.count-badge{margin-left:auto;background:#dcfce7;color:#13763b;border:1px solid #a7f3c0;padding:5px 10px;border-radius:30px;font-size:11px;font-weight:800;white-space:nowrap}
+.toolrow{display:flex;gap:6px;align-items:center;margin:6px 0;flex-wrap:nowrap}.toolrow>*{min-width:0;flex:1}.toolrow button{min-height:35px;line-height:1.15;padding:7px 6px;font-size:11px;border-radius:8px;white-space:normal}
+.toolrow select{font-size:11px;padding:7px;min-width:0}
+#savePlaylistBtn{background:#075985!important;border-color:#0891b2!important;color:#fff!important}#favoritesBtn{background:#854d0e!important;border-color:#f59e0b!important;color:#fff!important}#historyBtn{background:#4338ca!important;border-color:#818cf8!important;color:#fff!important}#dedupeBtn{background:#b91c1c!important;border-color:#f87171!important;color:#fff!important}#healthBtn{background:#15803d!important;border-color:#4ade80!important;color:#fff!important}#retryFailedBtn{background:#9a3412!important;border-color:#fb923c!important;color:#fff!important}#editChannelBtn{background:#6423a3!important;border-color:#c084fc!important;color:#fff!important}#compareBtn{background:#155e75!important;border-color:#22d3ee!important;color:#fff!important}#exportCategoryBtn,#exportAllBtn{background:#273fba!important;border-color:#7186ff!important;color:#fff!important}#exportCsvBtn,#exportGoodBtn{background:#087d3b!important;border-color:#4ade80!important;color:#fff!important}#exportTxtBtn{background:#a96008!important;border-color:#facc15!important;color:#fff!important}#exportBadBtn{background:#b91c1c!important;border-color:#f87171!important;color:#fff!important}#pipBtn{background:#087b98!important;border-color:#67e8f9!important;color:#fff!important}#themeSelect{border-color:#c4b5fd!important}
+.small-setting{font-size:10px;color:#586b90;white-space:nowrap}.small-setting input{width:48px!important;min-height:31px!important;padding:5px!important}
+.health-report{color:#34486e;font-size:11px;max-height:100px;overflow:auto}.advanced-tools{border:0;padding:0;margin:0}
+.player-actions{display:grid;grid-template-columns:1fr 1fr 1.4fr 1fr;gap:8px}
+.player-actions button{min-height:42px;color:#fff;border:0;border-radius:9px;font-size:12px;font-weight:800}
+#playerMarkVisible{background:#086bfa}#playerClearMarks{background:#c21e28}#playerCreateMarked{background:#087d39}#playerPlayNext{background:#f36b08}
+.left-dashboard{display:grid;grid-template-columns:1fr 1.2fr 1.1fr;gap:9px}
+.mini-panel{padding:11px!important}.mini-panel h2{margin-bottom:7px}.stat-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #edf1f8;font-size:12px;color:#1c315e}.stat-row:last-child{border-bottom:0}.stat-row strong{font-weight:850;color:#0b1b59}.stat-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px}.stat-dot.green{background:#16a34a}.stat-dot.red{background:#ef4444}.stat-dot.amber{background:#f59e0b}.wide-green,.wide-blue{width:100%;margin-top:7px;color:#fff!important;border:0!important}.wide-green{background:#079b49!important}.wide-blue{background:#0875ed!important}
+.category-panel{grid-column:1/-1}.category-chips{display:flex;gap:7px;flex-wrap:wrap}.category-chip{border:1px solid #b9ccff;background:#e9eaff;color:#3035a5;border-radius:8px;padding:7px 10px;font-size:11px;font-weight:800;cursor:pointer}.category-chip:hover{filter:brightness(.97)}.category-chip .chip-count{margin-left:7px;background:#fff;border:1px solid #c7d2fe;border-radius:12px;padding:1px 5px}
+.bottom{text-align:center;font-size:11px;margin-top:10px}.copyright{text-align:center;font-size:11px;color:#52658c}
+@media(min-width:1500px){.grid{grid-template-columns:minmax(0,1.58fr) minmax(450px,1fr)}}
+@media(max-width:1150px){.grid{grid-template-columns:minmax(0,1fr)}.dashboard-right{display:grid;grid-template-columns:1fr 1fr;align-items:start}.channel-panel{grid-column:1/-1}.export-tools{grid-column:1/-1}.channels{max-height:380px}}
+@media(max-width:700px){.wrap{padding:8px}.top{padding:10px;align-items:flex-start}.grid{gap:9px}.dashboard-right{display:flex}.channel-filters{grid-template-columns:1fr}.status-filters{flex-wrap:wrap}.selection-tools{grid-template-columns:1fr 1fr}.select-count{text-align:center}.player-actions{grid-template-columns:1fr 1fr}.left-dashboard{grid-template-columns:1fr 1fr}.category-panel{grid-column:1/-1}video{min-height:240px;max-height:none}.toolrow{flex-wrap:wrap}.toolrow>*{flex:1 1 30%}.top .actions{flex-wrap:wrap}}
+
+
+/* Final reference pass: header navigation and balanced dashboard proportions */
+.main-nav{display:flex;align-items:center;gap:8px;flex:1;justify-content:center;min-width:360px}
+.main-nav button{min-height:42px;padding:9px 13px;border:0;color:#fff;font-weight:800;font-size:12px;border-radius:10px;white-space:nowrap;box-shadow:0 3px 9px #10245c1a}
+.nav-home{background:#086bfa}.nav-playlist{background:#5b21b6}.nav-analyzer{background:#087a3c}.nav-editor{background:#f45b0a}.nav-compare{background:#c51f2d}.nav-export{background:#07869b}.nav-settings{background:#64748b}
+.top .actions{flex:0 0 auto}
+.urlrow{display:grid;grid-template-columns:175px 145px minmax(120px,1fr) 138px;gap:8px;width:100%}
+.urlrow .browse-inline,.urlrow .open-url-btn,.urlrow #playUrlBtn{min-height:43px}
+.urlrow .browse-inline{background:#086bfa;color:#fff;border-color:#086bfa}
+.urlrow .open-url-btn{background:#f8fbff;color:#17295b;border-color:#cbd8eb}
+.urlrow input{width:100%;min-width:0}
+.player-column{min-width:0;display:flex;flex-direction:column;gap:9px}
+.player-column>h2{margin-bottom:0}
+.player-column>.controls{margin:0}
+.player-column>.drop{margin-bottom:0}
+.player-column>.status{margin-top:0}
+.player-column>.note{margin-top:0}
+#homePanel{scroll-margin-top:10px}
+#channelPanel,#checkPanel,#actionsPanel,#exportPanel{scroll-margin-top:10px}
+@media(max-width:1500px){.main-nav{gap:5px;min-width:0}.main-nav button{padding:9px 10px;font-size:11px}.top{gap:9px}.brand{min-width:220px}.urlrow{grid-template-columns:145px 120px minmax(100px,1fr) 110px}}
+@media(max-width:1200px){.top{flex-wrap:wrap}.main-nav{order:3;flex:1 1 100%;justify-content:flex-start}.top .actions{margin-left:auto}.grid{grid-template-columns:minmax(0,1fr)}.dashboard-right{display:grid;grid-template-columns:1fr 1fr}.channel-panel,.export-tools{grid-column:1/-1}}
+@media(max-width:700px){.main-nav{overflow-x:auto;justify-content:flex-start;width:100%;padding-bottom:3px}.main-nav button{flex:0 0 auto}.urlrow{grid-template-columns:1fr 1fr}.urlrow input{grid-column:1/-1;grid-row:2}.urlrow #playUrlBtn{grid-column:2;grid-row:1}.dashboard-right{display:flex}.top .actions{width:100%}.player-column video{min-height:220px}}
+
+
+/* Final requested cleanup */
+#dropZone{display:none!important}
+.player-utility-controls{display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-top:-2px;min-height:34px}
+.player-select-wrap{display:flex;align-items:center;gap:4px;background:#f4f8ff;border:1px solid #cbd9ee;border-radius:8px;padding:3px 6px;color:#34527b;font-size:11px;font-weight:800}
+.player-select-wrap select{min-height:27px!important;height:27px!important;padding:3px 5px!important;font-size:10px!important;width:112px;max-width:18vw}
+#pipBtn,#customFullscreenBtn{height:32px;min-width:34px;padding:4px 9px;border-radius:8px;background:#0b7895!important;color:white!important;border:1px solid #22c5e7!important;font-size:18px;line-height:1}
+#customFullscreenBtn{background:#1e40af!important;border-color:#60a5fa!important}
+#exportPanel #pipBtn,#exportPanel #themeSelect,#exportPanel #audioSelect,#exportPanel #subtitleSelect{display:none!important}
+.settings-popover{position:absolute;z-index:80;right:12px;top:62px;width:220px;padding:13px;background:#fff;border:1px solid #cbd8eb;border-radius:12px;box-shadow:0 12px 35px #10264a2e;display:grid;gap:8px;color:#10245e}
+.settings-popover[hidden]{display:none!important}
+.settings-popover-title{font-weight:850;font-size:14px;margin-bottom:2px}.settings-popover label{font-size:11px;color:#53658c;font-weight:700}
+.main-nav{position:relative}
+.health-mini-head{display:flex;justify-content:space-between;align-items:center;gap:8px;border-top:1px solid #e3eaf5;padding-top:6px;margin-top:5px;color:#5c6e90;font-size:10px}
+.health-mini-head button{padding:3px 7px;font-size:10px;background:#e5efff;color:#1556a6;border:1px solid #b8d0f5;border-radius:6px}
+.health-mini-log{max-height:92px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;margin:5px 0 0;padding:7px;background:#f6f9ff;border:1px solid #dce6f4;border-radius:7px;color:#435678;font:10px/1.35 Consolas,monospace}
+#checkPanel{min-width:0}
+#healthReport{max-height:80px;overflow:auto}
+@media(max-width:700px){.player-utility-controls{flex-wrap:wrap}.player-select-wrap select{width:95px;max-width:30vw}.settings-popover{top:100%;right:5px}}
+
+
+/* Dashboard lower-left area: tall information cards and category row directly beneath */
+.left-dashboard{display:grid;grid-template-columns:1fr 1.15fr 1.08fr;gap:9px;align-items:stretch}
+.left-dashboard .mini-panel{min-height:245px;height:100%;display:flex;flex-direction:column}
+.left-dashboard .mini-panel .stat-row{padding:10px 0;font-size:12px}
+.left-dashboard .mini-panel .health-mini-log{max-height:125px}
+.left-dashboard .mini-panel .health-mini-head{margin-top:auto}
+.left-dashboard .category-panel{grid-column:1/-1;min-height:92px;margin-top:0}
+.left-dashboard .category-chips{align-content:flex-start}
+#checkPanel .sub{margin:7px 0 10px;line-height:1.4}
+#checkPanel .wide-green,#checkPanel .wide-blue{margin-top:8px;min-height:39px}
+#healthMiniLog{min-height:42px}
+#healthMiniLog[hidden]{display:none!important}
+@media(max-width:700px){.left-dashboard{grid-template-columns:1fr 1fr}.left-dashboard .mini-panel{min-height:190px}.left-dashboard .category-panel{grid-column:1/-1}}
+
+
+/* Final tidy-up based on screenshots */
+#exportPanel #healthReport{display:none!important}
+#exportPanel #compareReport{max-height:48px;overflow:auto}
+#healthMiniLog{max-height:115px;min-height:44px}
+#checkPanel{min-height:300px}
+.left-dashboard .mini-panel{min-height:300px}
+.left-dashboard .category-panel{min-height:92px}
+.top .actions .filebtn{background:linear-gradient(135deg,#086bfa,#0788ff)!important;color:#fff!important;border:1px solid #1684ff!important}
+.top .actions #clearBtn{background:linear-gradient(135deg,#d92532,#b91c1c)!important;color:#fff!important;border:1px solid #f87171!important}
+.about-backdrop{position:fixed;inset:0;z-index:9999;background:#07152dcc;display:none;align-items:center;justify-content:center;padding:16px}
+.about-backdrop.open{display:flex}
+.about-card{width:min(440px,100%);background:#fff;color:#112454;border:1px solid #d9e4f2;border-radius:18px;padding:22px;box-shadow:0 24px 70px #0005}
+.about-card h2{font-size:21px;margin:0}.about-card .about-brand{font-size:12px;color:#5b6d90;margin:4px 0 16px}
+.about-line{padding:10px 0;border-bottom:1px solid #e6edf7;font-size:13px;overflow-wrap:anywhere}
+.about-line strong{display:block;color:#5a6d91;font-size:10px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px}
+.about-close{margin-top:16px;width:100%;background:#086bfa!important;color:white!important;border:0!important}
+.nav-about{background:#0f766e!important;color:white!important}
+@media(max-width:1100px){.left-dashboard .mini-panel{min-height:240px}}
+
+
+/* User requested final header placement and always-visible health detail */
+.header-actions{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.header-actions #clearBtn{order:1;min-height:42px;padding:10px 16px;border-radius:10px;background:linear-gradient(135deg,#d92532,#b91c1c)!important;color:#fff!important;border:1px solid #f87171!important;font-weight:800;white-space:nowrap}
+.header-actions .header-about{order:2;min-height:42px;padding:10px 14px;border-radius:10px;background:#0f766e!important;color:#fff!important;border:1px solid #2dd4bf!important;font-weight:800;white-space:nowrap}
+.health-mini-head #toggleHealthLog{display:none!important}
+#healthMiniLog[hidden]{display:block!important}
+@media(max-width:1100px){.header-actions{margin-left:auto}.header-actions #clearBtn,.header-actions .header-about{min-height:38px;padding:8px 10px}}
+
+
+/* Settings opens its theme menu in place; it must not jump to Export Tools */
+.main-nav{position:relative}
+.settings-popover{top:calc(100% + 8px);right:0;z-index:100}
+.nav-settings{position:relative}
+@media(max-width:1200px){.settings-popover{top:calc(100% + 6px);right:auto;left:min(70%, 520px)}}
+
+
+/* Website embeds provide their own site header/footer; keep only the two app utilities. */
+.utility-bar{position:relative;display:flex;justify-content:flex-end;align-items:center;gap:8px;margin:0 0 10px;padding:0;min-height:38px}
+.utility-bar #settingsBtn,.utility-bar #clearBtn{min-height:36px;padding:8px 13px;border-radius:9px;font-size:12px;font-weight:800;color:#fff;border:1px solid transparent;box-shadow:0 3px 8px #10245c16}
+.utility-bar #settingsBtn{background:#64748b;border-color:#94a3b8}
+.utility-bar #clearBtn{background:linear-gradient(135deg,#d92532,#b91c1c);border-color:#f87171}
+.utility-bar .settings-popover{top:calc(100% + 5px);right:105px;left:auto;}
+@media(max-width:600px){.utility-bar{margin-bottom:8px}.utility-bar #settingsBtn,.utility-bar #clearBtn{padding:7px 10px}.utility-bar .settings-popover{right:95px}}
+
+</style>
+<link rel="stylesheet" href="https://eservicebd24.github.io/common.css"><link id="esbd-shared-assets" rel="stylesheet" href="https://eservicebd24.github.io/common.css"><script src="https://eservicebd24.github.io/common.js" defer></script></head>
+<body><div id="esbd-header-slot"></div>
+<div class="wrap">
+  <div class="utility-bar" aria-label="Player utilities">
+    <button type="button" class="nav-settings" id="settingsBtn">⚙ Settings</button>
+    <button id="clearBtn" type="button">▤ Clear playlist</button>
+    <div class="settings-popover" id="settingsPopover" hidden="">
+      <div class="settings-popover-title">⚙ Settings</div>
+      <label for="themeSelect">Appearance</label>
+      <select id="themeSelect" aria-label="Theme"><option value="light">Light theme</option><option value="dark">Dark theme</option></select>
+    </div>
+    <input id="fileInput" type="file" accept=".m3u,.m3u8,.txt,application/vnd.apple.mpegurl,audio/mpegurl" hidden="">
+  </div>
+  <div class="grid">
+    <main class="player-column" id="homePanel">
+      <h2>Open Playlist</h2>
+      <div class="controls">
+        <div class="urlrow">
+          <label class="filebtn browse-inline">▣ Browse M3U<input type="file" accept=".m3u,.m3u8,.txt,application/vnd.apple.mpegurl,audio/mpegurl" id="fileInputMirror"></label>
+          <button type="button" id="focusUrlBtn" class="open-url-btn">🔗 Open URL</button>
+          <input id="urlInput" type="text" placeholder="https://…" autocomplete="url">
+          <button class="primary" id="playUrlBtn">▶ Play URL</button>
+        </div>
+      </div>
+<video id="video" controls="" playsinline=""></video>
+      <div class="player-utility-controls" aria-label="Player options">
+        <label class="player-select-wrap" title="Audio track">♫ <select id="audioSelect" aria-label="Audio track"><option value="">Audio: Auto</option></select></label>
+        <label class="player-select-wrap" title="Subtitles">CC <select id="subtitleSelect" aria-label="Subtitle track"><option value="-1">Subtitles: Off</option></select></label>
+        <button id="pipBtn" type="button" title="Picture-in-Picture" aria-label="Picture-in-Picture">▣</button>
+        <button id="customFullscreenBtn" type="button" title="Fullscreen" aria-label="Fullscreen">⛶</button>
+      </div>
+
+      <div class="status"><span id="dot" class="dot"></span><span id="statusText">Ready — enter a stream URL or open a playlist.</span></div>
+      <div class="note">Tip: select a channel from the list on the right. Use the video controls for volume and fullscreen.</div>
+      <div class="player-actions">
+        <button id="playerMarkVisible" type="button">☑ Mark visible</button>
+        <button id="playerClearMarks" type="button">✕ Clear marks</button>
+        <button id="playerCreateMarked" type="button">▣ Create marked M3U</button>
+        <button id="playerPlayNext" type="button">⟳ Play next</button>
+      </div>
+      <div class="left-dashboard">
+        <section class="panel mini-panel">
+          <h2>▦ Playlist Info</h2>
+          <div class="stat-row"><span>Total Channels</span><strong id="statTotal">0</strong></div>
+          <div class="stat-row"><span>Categories</span><strong id="statCategories">0</strong></div>
+          <div class="stat-row"><span>With Logo</span><strong id="statLogos">0</strong></div>
+          <div class="stat-row"><span>Duplicate URLs</span><strong id="statDuplicates">0</strong></div>
+        </section>
+        <section class="panel mini-panel">
+          <h2>▣ Check Result</h2>
+          <div class="stat-row"><span><i class="stat-dot green"></i>Reachable</span><strong id="statReachable">0</strong></div>
+          <div class="stat-row"><span><i class="stat-dot red"></i>Errors</span><strong id="statErrors">0</strong></div>
+          <div class="stat-row"><span><i class="stat-dot amber"></i>Unknown / CORS</span><strong id="statUnknown">0</strong></div>
+          <div class="health-mini-head"><span>Latest check details</span><button id="toggleHealthLog" type="button">Show</button></div>
+          <pre id="healthMiniLog" class="health-mini-log">Health check has not started.</pre>
+        </section>
+        <section class="panel mini-panel" id="checkPanel">
+          <h2>⚙ Check Controls</h2>
+          <div class="sub">Timeout and retries are available in Export Tools.</div>
+          <button id="leftCheckAll" class="wide-green" type="button">▶ Check all channels</button>
+          <button id="leftRetry" class="wide-blue" type="button">⟳ Retry failed/unknown</button>
+        </section>
+        <section class="panel category-panel">
+          <h2>▰ Category Filter</h2>
+          <div id="categoryChips" class="category-chips"><span class="category-chip">All categories</span></div>
+        </section>
+      </div>
+    </main>
+    <aside class="dashboard-right">
+      <section class="panel channel-panel" id="channelPanel">
+        <div class="sidehead"><h2>☷ Playlist channels</h2><span id="count" class="sub">0 channels</span></div>
+        <div class="channel-filters">
+          <input id="searchInput" class="search" type="text" placeholder="Search channels…">
+          <select id="categoryFilter" aria-label="Filter category"><option value="">All categories</option></select>
+        </div>
+        <div class="status-filters">
+          <span class="filter-chip all-chip">All channels</span>
+          <select id="healthFilter" aria-label="Health status filter">
+            <option value="all">All status</option><option value="reachable">Reachable</option><option value="error">Errors</option><option value="unknown">Unknown / CORS blocked</option>
+          </select>
+          <span class="filter-chip fav-chip">★ Favorites</span>
+        </div>
+        <div class="selection-tools">
+          <button id="selectVisibleBtn" type="button">☑ Mark visible</button>
+          <button id="clearSelectionBtn" type="button">✕ Clear marks</button>
+          <button id="createSelectedBtn" type="button">⬇ Create marked M3U</button>
+          <span id="selectedCount" class="select-count">0 marked</span>
+        </div>
+        <div id="channels" class="channels"><div class="empty">No playlist loaded yet.</div></div>
+        <div class="note" id="playlistName">No file selected.</div>
+      </section>
+
+      <section class="panel current-playlist">
+        <div class="section-title"><span class="section-icon blue">▤</span><div><h2>Current Playlist</h2><div class="sub" id="currentPlaylistLabel">Load a playlist to begin</div></div><span class="count-badge" id="channelCountBadge">0 channels</span></div>
+        <div class="toolrow save-row">
+          <button id="savePlaylistBtn">＋ Save Playlist</button>
+          <select id="savedPlaylists" aria-label="Saved playlists"><option value="">Saved playlists…</option></select>
+          <button id="loadSavedBtn">Load</button>
+        </div>
+      </section>
+
+      <section class="panel channel-actions" id="actionsPanel">
+        <div class="section-title"><span class="section-icon orange">⚒</span><h2>Channel Actions</h2></div>
+        <div class="toolrow">
+          <button id="editChannelBtn">✎ Edit selected channel</button>
+          <button id="dedupeBtn">▣ Remove duplicates</button>
+          <button id="healthBtn">✓ Check all channels</button>
+        </div>
+        <div class="toolrow">
+          <button id="favoritesBtn">★ Favorites</button>
+          <button id="historyBtn">◷ History</button>
+          <button id="compareBtn">⇄ Compare playlist</button>
+          <input id="compareFile" type="file" accept=".m3u,.m3u8,.txt" hidden="">
+        </div>
+      </section>
+
+      <section class="panel export-tools" id="exportPanel">
+        <div class="section-title"><span class="section-icon teal">⇩</span><h2>Export Tools</h2></div>
+        <div class="toolrow">
+          <select id="exportCategory" aria-label="Export category"><option value="">All categories</option></select>
+        </div>
+        <div class="toolrow">
+          <button id="exportAllBtn">Export sorted M3U</button>
+          <button id="exportGoodBtn">Export reachable</button>
+          <button id="exportBadBtn">Export errors</button>
+        </div>
+        <div class="toolrow">
+          <button id="exportCategoryBtn">Export category M3U</button>
+          <button id="exportCsvBtn">Export CSV</button>
+          <button id="exportTxtBtn">Export TXT</button>
+        </div>
+        <div class="toolrow">
+          <label class="small-setting">Timeout (sec) <input id="timeoutSeconds" type="number" min="2" max="60" value="7"></label>
+          <label class="small-setting">Retries <input id="retryCount" type="number" min="0" max="3" value="1"></label>
+          <button id="retryFailedBtn">Retry failed/unknown</button>
+        </div>
+
+        <div id="compareReport" class="health-report"></div>
+        <div id="healthReport" class="health-report" aria-live="polite"></div>
+      </section>
+    </aside>
+  </div>
+  <div class="bottom">Standalone HTML player for desktop browsers. Some streams may not play in a browser because of codec, authentication, mixed-content, or CORS restrictions; this page cannot bypass those restrictions.</div>
+</div>
+<div class="about-backdrop" id="aboutBackdrop" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+  <div class="about-card">
+    <h2 id="aboutTitle">Desktop M3U Player</h2>
+    <div class="about-brand">Playlist Manager · SC Android Studio</div>
+    <div class="about-line"><strong>Developer / Team</strong>SC Android Studio</div>
+    <div class="about-line"><strong>Email</strong><a href="mailto:jakareachakladar@gmail.com">jakareachakladar@gmail.com</a></div>
+    <div class="about-line"><strong>Contact</strong><a href="tel:+8801303072964">+8801303-072964</a></div>
+    <div class="about-line"><strong>Copyright</strong>© SC Android Studio — All Rights Reserved.</div>
+    <button class="about-close" type="button" id="aboutCloseBtn">Close</button>
+  </div>
+</div>
+<div class="modal-backdrop" id="markedBuilderBackdrop" role="dialog" aria-modal="true" aria-labelledby="markedBuilderTitle">
+  <form class="builder-modal" id="markedBuilderForm">
+    <div class="modal-title"><div class="modal-icon">📥</div><div><h2 id="markedBuilderTitle" style="margin:0">Create marked M3U</h2><div class="sub">Build a new playlist from selected channels</div></div></div>
+    <p class="modal-sub">Choose a playlist name and optionally apply one category to every marked channel.</p>
+    <div class="modal-count" id="builderMarkedCount">0 channels selected</div>
+    <label class="field-label" for="markedPlaylistName">PLAYLIST NAME</label>
+    <input id="markedPlaylistName" type="text" placeholder="e.g. My Favorite Channels" required="" maxlength="100" autocomplete="off">
+    <label class="field-label" for="markedPlaylistCategory">CATEGORY</label>
+    <input id="markedPlaylistCategory" type="text" list="markedCategoryOptions" placeholder="Leave blank to keep original categories" maxlength="80" autocomplete="off">
+    <datalist id="markedCategoryOptions"></datalist>
+    <div class="modal-hint">Blank = preserve each channel's original category. Enter a category name = apply that category to all marked channels. Channel names, stream URLs and logo URLs are preserved.</div>
+    <div class="modal-actions"><button type="button" class="modal-cancel" id="cancelMarkedBuilder">Cancel</button><button type="submit" class="modal-save">⬇ Create M3U</button></div>
+  </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
+<script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const video = $('video');
+  let hls = null, items = [], active = -1, healthResults = new Map(), viewCollection = '', currentPlaylistText = '';
+  const selectedChannels = new Set();
+  const setStatus = (msg, type='') => {
+    $('statusText').textContent = msg;
+    $('dot').className = 'dot' + (type ? ' ' + type : '');
+  };
+  const cleanupHls = () => { if (hls) { hls.destroy(); hls = null; } };
+  const cleanUrl = s => (s || '').trim().replace(/^["']|["']$/g,'');
+  let dash = null;
+  function playUrl(raw, name='Direct URL') {
+    const url = cleanUrl(raw);
+    if (!/^https?:\/\//i.test(url) && !/^blob:/i.test(url)) {
+      setStatus('Please enter a valid http:// or https:// URL.', 'bad'); return;
+    }
+    cleanupHls();
+    if (dash) { try { dash.reset(); } catch(e) {} dash = null; }
+    video.pause(); video.removeAttribute('src'); video.load();
+    $('urlInput').value = url;
+    setStatus('Opening: ' + name);
+    const isDash = /\.mpd(?:$|[?#])/i.test(url);
+    const isHls = /\.m3u8(?:$|[?#])/i.test(url) || /mpegurl/i.test(url);
+    if (isDash && window.dashjs) {
+      try {
+        dash = dashjs.MediaPlayer().create();
+        dash.initialize(video, url, false);
+        dash.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, () => {
+          video.play().then(()=>setStatus('Playing DASH: ' + name, 'good'))
+            .catch(()=>setStatus('DASH loaded. Press Play. If it fails, the stream may require DRM/authentication.', ''));
+        });
+        dash.on(dashjs.MediaPlayer.events.ERROR, (e) => {
+          setStatus('DASH playback failed. This stream may require DRM/authentication or may be blocked/offline.', 'bad');
+        });
+      } catch (e) {
+        setStatus('DASH player could not start. Check browser compatibility and stream access.', 'bad');
+      }
+    } else if (isHls && window.Hls && Hls.isSupported()) {
+      hls = new Hls({enableWorker:true, lowLatencyMode:false, maxBufferLength:30});
+      hls.loadSource(url); hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        video.play().then(()=>setStatus('Playing: ' + name, 'good'))
+          .catch(()=>setStatus('Stream loaded. Press Play. If playback fails, check stream/CORS access.', ''));
+      });
+      hls.on(Hls.Events.ERROR, (_event, data) => {
+        if (data && data.fatal) {
+          setStatus('HLS playback failed: stream offline, CORS blocked, or access denied.', 'bad');
+        }
+      });
+    } else {
+      video.src = url;
+      video.load();
+      video.play().then(()=>setStatus('Playing: ' + name, 'good'))
+        .catch(()=>setStatus('URL loaded. Press Play. Browser support varies by stream format.', ''));
+    }
+  }
+  function parseM3U(text) {
+    const lines = text.replace(/^\uFEFF/,'').split(/\r?\n/);
+    const found = [];
+    let meta = '';
+    for (const raw of lines) {
+      const line = raw.trim();
+      if (!line) continue;
+      if (line.startsWith('#EXTINF')) { meta = line; continue; }
+      if (line.startsWith('#')) continue;
+      const url = line;
+      const attr = (key) => {
+        const re = new RegExp('(?:^|\\s)' + key + '="([^"]*)"','i');
+        const m = meta.match(re); return m ? m[1] : '';
+      };
+      let name = '';
+      const comma = meta.indexOf(',');
+      if (comma >= 0) name = meta.slice(comma + 1).trim();
+      if (!name) name = attr('tvg-name') || url;
+      found.push({name, url, logo:attr('tvg-logo'), group:attr('group-title')});
+      meta = '';
+    }
+    return found;
+  }
+  function renderChannels() {
+    if (typeof updateDashboardStats === 'function') updateDashboardStats();
+    const query = $('searchInput').value.trim().toLowerCase();
+    const list = $('channels'); list.innerHTML = '';
+    const cat = $('categoryFilter') ? $('categoryFilter').value : '';
+    const hf = $('healthFilter') ? $('healthFilter').value : 'all';
+    const visible = items.map((item,index)=>({...item,index,health:healthResults.get(item.url)?.status || 'unchecked'})).filter(x => (x.name+' '+x.group+' '+x.url).toLowerCase().includes(query) && (!cat || x.group===cat) && (hf==='all' || (hf==='reachable' && x.health==='reachable') || (hf==='error' && x.health==='error') || (hf==='unknown' && x.health==='unknown')));
+    $('count').textContent = items.length + ' channels' + (healthResults.size ? ' · checked '+healthResults.size : '');
+    updateSelectedCount();
+    if (!visible.length) { list.innerHTML = '<div class="empty">'+(items.length ? 'No matching channels.' : 'No playlist loaded yet.')+'</div>'; return; }
+    visible.forEach(x => {
+      const b = document.createElement('div');
+      b.setAttribute('role','button'); b.tabIndex=0;
+      b.className = 'channel' + (x.index === active ? ' active' : '') + (selectedChannels.has(x.index) ? ' selected' : '');
+      const check = document.createElement('input'); check.type='checkbox'; check.className='channel-check'; check.checked=selectedChannels.has(x.index); check.setAttribute('aria-label','Mark '+x.name);
+      check.addEventListener('click',e=>e.stopPropagation());
+      check.addEventListener('change',e=>{if(e.target.checked)selectedChannels.add(x.index);else selectedChannels.delete(x.index);b.classList.toggle('selected',e.target.checked);updateSelectedCount();});
+      b.append(check);
+      const num = document.createElement('span'); num.className='num'; num.textContent=String(x.index+1).padStart(2,'0');
+      const name = document.createElement('span'); name.className='cname'; name.textContent=x.name + (x.group ? ' · '+x.group : '');
+      let logoNode;
+      if(x.logo){logoNode=document.createElement('img');logoNode.className='channel-logo';logoNode.alt='';logoNode.loading='lazy';logoNode.referrerPolicy='no-referrer';logoNode.src=x.logo;logoNode.onerror=()=>{const f=document.createElement('span');f.className='channel-logo-fallback';f.textContent=(x.name||'TV').slice(0,2).toUpperCase();logoNode.replaceWith(f);};}
+      else {logoNode=document.createElement('span');logoNode.className='channel-logo-fallback';logoNode.textContent=(x.name||'TV').slice(0,2).toUpperCase();}
+      b.append(num,logoNode,name);
+      const favmark=document.createElement('span');favmark.className='favmark';favmark.textContent=(JSON.parse(localStorage.getItem('m3u_favorites')||'[]').some(f=>f.url===x.url))?'★':'';
+      b.append(favmark);
+      if(x.health!=='unchecked'){const hs=document.createElement('span');hs.className='health-pill';hs.textContent=x.health==='reachable'?'OK':x.health==='error'?'ERROR':'?';hs.title=x.health;b.append(hs);}
+      b.addEventListener('contextmenu',e=>{e.preventDefault();toggleFavorite(x);});
+      b.addEventListener('click',e=>{if(e.target===check)return;active=x.index;addHistory(x);renderChannels();playUrl(x.url,x.name);});
+      b.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target===b){e.preventDefault();active=x.index;addHistory(x);renderChannels();playUrl(x.url,x.name);}});
+      list.appendChild(b);
+    });
+  }
+  function loadText(text, filename='Playlist') {
+    items = parseM3U(text); active = -1; selectedChannels.clear();
+    $('playlistName').textContent = filename;
+    rebuildCategories();
+    renderChannels();
+    if (typeof updateDashboardStats === 'function') updateDashboardStats();
+    if (items.length) setStatus('Loaded ' + items.length + ' channel entries from ' + filename, 'good');
+    else setStatus('No channel URLs found. Make sure this is a valid M3U/M3U8 playlist.', 'bad');
+  }
+  async function openUrlOrPlaylist(raw) {
+    const url = cleanUrl(raw);
+    if (!/^https?:\/\//i.test(url)) {
+      setStatus('Please enter a valid http:// or https:// URL.', 'bad'); return;
+    }
+    // .m3u is a channel list; .m3u8 is commonly an HLS media stream.
+    if (/\.m3u(?:$|[?#])/i.test(url) && !/\.m3u8(?:$|[?#])/i.test(url)) {
+      setStatus('Downloading remote M3U playlist…');
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const text = await response.text();
+        if (!text.trim().startsWith('#EXTM3U') && !text.includes('#EXTINF')) {
+          throw new Error('The URL did not return M3U playlist text.');
+        }
+        loadText(text, url.split('/').pop().split(/[?#]/)[0] || 'Remote playlist');
+      } catch (err) {
+        setStatus('Could not read this remote playlist (' + (err.message || 'network/CORS error') + '). Download the .m3u file and use Browse playlist.', 'bad');
+      }
+      return;
+    }
+    playUrl(url);
+  }
+  $('playUrlBtn').addEventListener('click',()=>openUrlOrPlaylist($('urlInput').value));
+  $('urlInput').addEventListener('keydown',e=>{if(e.key==='Enter') openUrlOrPlaylist($('urlInput').value);});
+  $('fileInput').addEventListener('change', async e=>{
+    const file=e.target.files && e.target.files[0]; if(!file)return;
+    try { loadText(await file.text(),file.name); } catch(err) { setStatus('Could not read selected file.', 'bad'); }
+    e.target.value='';
+  });
+  $('searchInput').addEventListener('input',renderChannels);
+  $('clearBtn').addEventListener('click',()=>{
+    items=[];active=-1;selectedChannels.clear();cleanupHls();if(dash){try{dash.reset();}catch(e){}dash=null;}video.pause();video.removeAttribute('src');video.load();
+    $('playlistName').textContent='No file selected.';$('channels').innerHTML='<div class="empty">No playlist loaded yet.</div>';
+    $('count').textContent='0 channels';setStatus('Playlist cleared.');
+  });
+  const dz=$('dropZone');
+  // The visual drop-zone is intentionally hidden/removed in this layout.
+  // Keep drag-and-drop support only when a drop-zone element exists.
+  if(dz){
+    dz.addEventListener('click',()=> $('fileInput').click());
+    dz.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('fileInput').click();}});
+    dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('over');});
+    dz.addEventListener('dragleave',()=>dz.classList.remove('over'));
+    dz.addEventListener('drop',async e=>{
+      e.preventDefault();dz.classList.remove('over');
+      const file=e.dataTransfer.files && e.dataTransfer.files[0];
+      if(file){try{loadText(await file.text(),file.name);}catch(err){setStatus('Could not read dropped file.','bad');}return;}
+      const text=e.dataTransfer.getData('text/uri-list')||e.dataTransfer.getData('text/plain');
+      if(text.trim()) openUrlOrPlaylist(text.trim());
+    });
+  }
+
+  function updateSelectedCount(){
+    const valid=[...selectedChannels].filter(i=>i>=0&&i<items.length);
+    $('selectedCount').textContent=valid.length+' marked';
+    $('createSelectedBtn').textContent=valid.length?'⬇ Create marked M3U ('+valid.length+')':'⬇ Create marked M3U';
+  }
+  $('selectVisibleBtn').addEventListener('click',()=>{
+    const query=$('searchInput').value.trim().toLowerCase(),cat=$('categoryFilter')?.value||'',hf=$('healthFilter')?.value||'all';
+    items.forEach((x,i)=>{const health=healthResults.get(x.url)?.status||'unchecked';const matches=(x.name+' '+x.group+' '+x.url).toLowerCase().includes(query)&&(!cat||x.group===cat)&&(hf==='all'||(hf==='reachable'&&health==='reachable')||(hf==='error'&&health==='error')||(hf==='unknown'&&health==='unknown'));if(matches)selectedChannels.add(i);});
+    renderChannels();setStatus('Marked all currently visible channels.','good');
+  });
+  $('clearSelectionBtn').addEventListener('click',()=>{selectedChannels.clear();renderChannels();setStatus('All channel marks cleared.');});
+  function openMarkedBuilder(){
+    const chosen=[...selectedChannels].filter(i=>i>=0&&i<items.length).map(i=>items[i]);
+    if(!chosen.length){setStatus('First mark one or more channels using the checkboxes.','bad');return;}
+    $('builderMarkedCount').textContent=chosen.length+' channel'+(chosen.length===1?'':'s')+' selected';
+    $('markedPlaylistName').value='My_Selected_Channels';
+    $('markedPlaylistCategory').value='';
+    const dl=$('markedCategoryOptions');dl.innerHTML='';
+    [...new Set(chosen.map(x=>x.group).filter(Boolean))].sort((a,b)=>a.localeCompare(b)).forEach(c=>{const o=document.createElement('option');o.value=c;dl.append(o);});
+    $('markedBuilderBackdrop').classList.add('open');
+    setTimeout(()=>$('markedPlaylistName').focus(),30);
+  }
+  function closeMarkedBuilder(){$('markedBuilderBackdrop').classList.remove('open');}
+  $('createSelectedBtn').addEventListener('click',openMarkedBuilder);
+  $('cancelMarkedBuilder').addEventListener('click',closeMarkedBuilder);
+  $('markedBuilderBackdrop').addEventListener('click',e=>{if(e.target===$('markedBuilderBackdrop'))closeMarkedBuilder();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('markedBuilderBackdrop').classList.contains('open'))closeMarkedBuilder();});
+  $('markedBuilderForm').addEventListener('submit',e=>{
+    e.preventDefault();
+    const chosen=[...selectedChannels].filter(i=>i>=0&&i<items.length).map(i=>({...items[i]}));
+    if(!chosen.length){closeMarkedBuilder();setStatus('No marked channels remain.','bad');return;}
+    const rawName=$('markedPlaylistName').value.trim();
+    if(!rawName){$('markedPlaylistName').focus();return;}
+    const category=$('markedPlaylistCategory').value.trim();
+    if(category)chosen.forEach(x=>x.group=category);
+    const safeName=rawName.replace(/\.m3u8?$/i,'').replace(/[\\/:*?"<>|]+/g,'_').replace(/\s+/g,'_')||'My_Selected_Channels';
+    const filename=safeName+'.m3u';
+    exportM3U(categorySorted(chosen),filename);
+    closeMarkedBuilder();
+    setStatus('Created '+filename+' with '+chosen.length+' channels'+(category?' in category "'+category+'"':'; original categories preserved')+'.','good');
+  });
+
+  // Advanced features: saved playlists, favorites/history, duplicate removal, health checks, settings.
+  const readStore=(key,fallback=[])=>{try{return JSON.parse(localStorage.getItem(key)||JSON.stringify(fallback));}catch(e){return fallback;}};
+  const writeStore=(key,val)=>{try{localStorage.setItem(key,JSON.stringify(val));}catch(e){setStatus('Browser storage is unavailable; settings may not persist.','bad');}};
+  function rebuildCategories(){
+    const sel=$('categoryFilter'); if(!sel)return;
+    const prev=sel.value; const cats=[...new Set(items.map(x=>x.group).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+    sel.innerHTML='<option value="">All categories</option>';
+    cats.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;sel.append(o);});
+    if(cats.includes(prev))sel.value=prev;
+    const ex=$('exportCategory'); if(ex){const old=ex.value;ex.innerHTML='<option value="">All categories</option>';cats.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;ex.append(o);});if(cats.includes(old))ex.value=old;}
+  }
+  function toggleFavorite(item){
+    let favs=readStore('m3u_favorites'); const idx=favs.findIndex(f=>f.url===item.url);
+    if(idx>=0)favs.splice(idx,1);else favs.unshift({name:item.name,url:item.url,group:item.group||'',logo:item.logo||''});
+    writeStore('m3u_favorites',favs); renderChannels(); setStatus(idx>=0?'Removed from favorites.':'Added to favorites.','good');
+  }
+  function addHistory(item){
+    let hist=readStore('m3u_history');hist=hist.filter(x=>x.url!==item.url);
+    hist.unshift({name:item.name,url:item.url,group:item.group||'',logo:item.logo||'',playedAt:new Date().toISOString()});
+    writeStore('m3u_history',hist.slice(0,100));writeStore('m3u_last_channel',hist[0]);
+  }
+  function showCollection(key,label){
+    const arr=readStore(key); if(!arr.length){setStatus(label+' is empty.');return;}
+    items=arr.map(x=>({name:x.name,url:x.url,group:x.group||'',logo:x.logo||''}));active=-1;
+    $('playlistName').textContent=label;rebuildCategories();renderChannels();setStatus('Loaded '+items.length+' '+label.toLowerCase()+'.','good');
+  }
+  function refreshSavedPlaylists(){
+    const sel=$('savedPlaylists'), saved=readStore('m3u_saved_playlists'), prev=sel.value;
+    sel.innerHTML='<option value="">Saved playlists…</option>';
+    saved.forEach((x,i)=>{const o=document.createElement('option');o.value=String(i);o.textContent=x.name+' ('+x.items.length+')';sel.append(o);});
+    if(prev && saved[Number(prev)])sel.value=prev;
+  }
+  $('savePlaylistBtn').addEventListener('click',()=>{
+    if(!items.length){setStatus('Load a playlist first, then save it.','bad');return;}
+    const name=prompt('Name this playlist:',$('playlistName').textContent||'My Playlist');if(!name)return;
+    const saved=readStore('m3u_saved_playlists');saved.push({name:name.trim(),items:items.map(x=>({...x}))});
+    writeStore('m3u_saved_playlists',saved);refreshSavedPlaylists();setStatus('Playlist saved in this browser.','good');
+  });
+  $('loadSavedBtn').addEventListener('click',()=>{
+    const idx=Number($('savedPlaylists').value),saved=readStore('m3u_saved_playlists');
+    if($('savedPlaylists').value===''||!saved[idx])return;
+    items=saved[idx].items.map(x=>({...x}));active=-1;$('playlistName').textContent=saved[idx].name;
+    rebuildCategories();renderChannels();setStatus('Loaded saved playlist: '+saved[idx].name,'good');
+  });
+  $('favoritesBtn').addEventListener('click',()=>showCollection('m3u_favorites','Favorites'));
+  $('historyBtn').addEventListener('click',()=>showCollection('m3u_history','History'));
+  $('dedupeBtn').addEventListener('click',()=>{
+    const before=items.length, seen=new Set();items=items.filter(x=>{const k=(x.url||'').trim();if(!k||seen.has(k))return false;seen.add(k);return true;});
+    active=-1;rebuildCategories();renderChannels();setStatus('Removed '+(before-items.length)+' duplicate/empty URL entries.','good');
+  });
+  $('categoryFilter').addEventListener('change',renderChannels);
+  $('themeSelect').addEventListener('change',()=>{
+    document.body.classList.toggle('light',$('themeSelect').value==='light');
+    writeStore('m3u_settings',{theme:$('themeSelect').value});
+  });
+  function refreshTracks(){
+    const a=$('audioSelect'),sub=$('subtitleSelect');a.innerHTML='<option value="">Audio track: Auto</option>';sub.innerHTML='<option value="-1">Subtitles: Off</option>';
+    if(hls && hls.audioTracks){hls.audioTracks.forEach((t,i)=>{const o=document.createElement('option');o.value=String(i);o.textContent=t.name||t.lang||('Audio '+(i+1));a.append(o);});}
+    try{Array.from(video.audioTracks||[]).forEach((t,i)=>{const o=document.createElement('option');o.value='native:'+i;o.textContent=t.label||t.language||('Audio '+(i+1));a.append(o);});}catch(e){}
+    Array.from(video.textTracks||[]).forEach((t,i)=>{const o=document.createElement('option');o.value=String(i);o.textContent=t.label||t.language||('Subtitle '+(i+1));sub.append(o);});
+  }
+  $('audioSelect').addEventListener('change',()=>{
+    const v=$('audioSelect').value;
+    if(v==='' ) {if(hls)hls.audioTrack=-1;return;}
+    if(v.startsWith('native:')){try{const ix=Number(v.split(':')[1]);Array.from(video.audioTracks).forEach((t,i)=>t.enabled=i===ix);}catch(e){}}
+    else if(hls)hls.audioTrack=Number(v);
+  });
+  $('subtitleSelect').addEventListener('change',()=>{
+    const v=Number($('subtitleSelect').value);Array.from(video.textTracks||[]).forEach((t,i)=>t.mode=(i===v?'showing':'disabled'));
+    if(hls && hls.subtitleTracks){hls.subtitleTrack=v>=0?v:-1;}
+  });
+  function exportM3U(list, filename){
+    const lines=['#EXTM3U'];
+    list.forEach(item=>{
+      const attrs=[];
+      if(item.logo)attrs.push('tvg-logo="'+String(item.logo).replace(/"/g,'')+'"');
+      if(item.group)attrs.push('group-title="'+String(item.group).replace(/"/g,'')+'"');
+      lines.push('#EXTINF:-1 '+attrs.join(' ')+','+(item.name||'Unknown channel'));
+      lines.push(item.url);
+    });
+    const blob=new Blob([lines.join('\r\n')+'\r\n'],{type:'audio/x-mpegurl;charset=utf-8'});
+    const a=document.createElement('a');const obj=URL.createObjectURL(blob);a.href=obj;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(obj),1000);
+  }
+  function categorySorted(list){
+    return [...list].sort((a,b)=>(a.group||'Uncategorized').localeCompare(b.group||'Uncategorized') || (a.name||'').localeCompare(b.name||''));
+  }
+  $('exportAllBtn').addEventListener('click',()=>{
+    if(!items.length){setStatus('Load a playlist first.','bad');return;}
+    exportM3U(categorySorted(items),'playlist_sorted_by_category.m3u');
+  });
+  $('exportGoodBtn').addEventListener('click',()=>{
+    const good=categorySorted(items.filter(x=>healthResults.get(x.url)?.status==='reachable'));
+    if(!good.length){setStatus('No confirmed reachable channels yet. Run Check all channels first.','bad');return;}
+    exportM3U(good,'playlist_reachable_channels.m3u');
+  });
+  $('exportBadBtn').addEventListener('click',()=>{
+    const bad=categorySorted(items.filter(x=>healthResults.get(x.url)?.status==='error'));
+    if(!bad.length){setStatus('No confirmed error channels yet. Run Check all channels first.','bad');return;}
+    exportM3U(bad,'playlist_error_channels.m3u');
+  });
+  $('healthFilter').addEventListener('change',renderChannels);
+  $('healthBtn').addEventListener('click',async()=>{
+    const report=$('healthReport');
+    const button=$('healthBtn');
+    if(!items.length){report.textContent='Load a playlist first.';return;}
+    if(button.dataset.running==='1')return;
+    button.dataset.running='1'; button.disabled=true;
+    const unique=[...new Map(items.filter(x=>x.url).map(x=>[x.url,x])).values()];
+    let done=0,good=0,bad=0,unknown=0,next=0;
+    const concurrency=4;
+    const timeout=Math.max(2,Math.min(60,Number($('timeoutSeconds').value)||7))*1000;
+    const retries=Math.max(0,Math.min(3,Number($('retryCount').value)||0));
+    report.textContent='Progress 0/'+unique.length+' | Reachable 0 | Errors 0 | Unknown/CORS 0';
+    const checkOne=async item=>{
+      let result={status:'unknown',detail:'CORS/OFFLINE/NETWORK',ms:null};
+      for(let attempt=0;attempt<=retries;attempt++){
+        const started=performance.now();
+        const controller=new AbortController();
+        let timer;
+        try{
+          timer=setTimeout(()=>controller.abort(),timeout);
+          const response=await fetch(item.url,{method:'GET',mode:'cors',cache:'no-store',signal:controller.signal,headers:{Range:'bytes=0-1'}});
+          const ms=Math.round(performance.now()-started);
+          if(response.ok || response.status===206) result={status:'reachable',detail:'HTTP '+response.status,ms};
+          else if(response.status===401||response.status===403||response.status===404||response.status>=500) result={status:'error',detail:'HTTP '+response.status,ms};
+          else result={status:'unknown',detail:'HTTP '+response.status,ms};
+          try{await response.body?.cancel();}catch(e){}
+        }catch(e){
+          result=e.name==='AbortError'
+            ? {status:'unknown',detail:'TIMEOUT',ms:Math.round(performance.now()-started)}
+            : {status:'unknown',detail:'CORS/OFFLINE/NETWORK',ms:Math.round(performance.now()-started)};
+        }finally{if(timer)clearTimeout(timer);}
+        if(result.status==='reachable'||(result.status==='error'&&result.detail.startsWith('HTTP ')))break;
+      }
+      healthResults.set(item.url,result);
+      if(result.status==='reachable')good++;else if(result.status==='error')bad++;else unknown++;
+      done++;
+      if(done===unique.length || done%5===0){
+        report.textContent='Progress '+done+'/'+unique.length+' | Reachable '+good+' | Errors '+bad+' | Unknown/CORS '+unknown+'\n\n'+
+          unique.filter(q=>healthResults.has(q.url)).slice(-12).map(q=>q.name+' — '+healthResults.get(q.url).detail+(healthResults.get(q.url).ms!=null?' ('+healthResults.get(q.url).ms+' ms)':'')).join('\n');
+        if(typeof updateDashboardStats==='function')updateDashboardStats();
+        renderChannels();
+        await new Promise(resolve=>setTimeout(resolve,0));
+      }
+    };
+    try{
+      const workers=Array.from({length:Math.min(concurrency,unique.length)},async()=>{
+        while(true){const index=next++;if(index>=unique.length)return;await checkOne(unique[index]);}
+      });
+      await Promise.all(workers);
+      const rows=unique.map(x=>x.name+' | '+x.url+' | '+(healthResults.get(x.url)?.status||'unknown')+' | '+(healthResults.get(x.url)?.detail||'not checked')+' | '+(healthResults.get(x.url)?.ms??'')+' ms');
+      const summary='Total unique URLs: '+unique.length+'\nReachable: '+good+'\nErrors: '+bad+'\nUnknown / CORS blocked: '+unknown+'\n\n'+rows.join('\r\n');
+      downloadText(summary,'channel-health-report.txt');
+      setStatus('Check complete: '+good+' reachable, '+bad+' errors, '+unknown+' unknown/CORS.','good');
+    }catch(e){
+      report.textContent+='\\nHealth check stopped: '+(e?.message||e);
+      setStatus('Health check stopped unexpectedly.','bad');
+    }finally{
+      button.dataset.running='0';button.disabled=false;
+      if(typeof updateDashboardStats==='function')updateDashboardStats();
+      renderChannels();
+    }
+  });
+
+  function downloadText(content, filename, type='text/plain;charset=utf-8'){
+    const blob=new Blob([content],{type});const a=document.createElement('a');const u=URL.createObjectURL(blob);a.href=u;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);
+  }
+  function csvEscape(v){return '"'+String(v??'').replace(/"/g,'""')+'"';}
+  function exportCSV(list,filename='playlist_channels.csv'){
+    const rows=[['Name','URL','Category','Logo URL','Health','Response Time (ms)']];
+    list.forEach(x=>{const h=healthResults.get(x.url)||{};rows.push([x.name,x.url,x.group||'Uncategorized',x.logo||'',h.status||'unchecked',h.ms??'']);});
+    downloadText(rows.map(r=>r.map(csvEscape).join(',')).join('\r\n'),filename,'text/csv;charset=utf-8');
+  }
+  $('exportCategoryBtn').addEventListener('click',()=>{
+    const cat=$('exportCategory').value;const list=categorySorted(items.filter(x=>!cat||x.group===cat));
+    if(!list.length){setStatus('No channels to export.','bad');return;}
+    exportM3U(list,(cat||'all_categories').replace(/[^a-z0-9_-]+/gi,'_')+'.m3u');
+  });
+  $('exportCsvBtn').addEventListener('click',()=>exportCSV(categorySorted(items)));
+  $('exportTxtBtn').addEventListener('click',()=>{
+    const list=categorySorted(items);
+    const txt=list.map(x=>{const h=healthResults.get(x.url)||{};return `[${x.group||'Uncategorized'}] ${x.name}\nURL: ${x.url}\nLogo: ${x.logo||''}\nHealth: ${h.status||'unchecked'}${h.ms!=null?' · '+h.ms+' ms':''}`;}).join('\n\n');
+    downloadText(txt,'playlist_channels.txt');
+  });
+  $('editChannelBtn').addEventListener('click',()=>{
+    if(active<0||!items[active]){setStatus('Select a channel first, then click Edit selected channel.','bad');return;}
+    const x=items[active];
+    const name=prompt('Channel name:',x.name);if(name===null)return;
+    const url=prompt('Stream URL:',x.url);if(url===null)return;
+    const logo=prompt('Logo URL:',x.logo||'');if(logo===null)return;
+    const group=prompt('Category / group-title:',x.group||'Uncategorized');if(group===null)return;
+    const oldUrl=x.url;items[active]={...x,name:name.trim()||x.name,url:url.trim(),logo:logo.trim(),group:group.trim()};
+    if(oldUrl!==items[active].url && healthResults.has(oldUrl))healthResults.delete(oldUrl);
+    rebuildCategories();renderChannels();setStatus('Channel changes applied. Export M3U to save them to a file.','good');
+  });
+  $('compareBtn').addEventListener('click',()=>$('compareFile').click());
+  $('compareFile').addEventListener('change',async e=>{
+    const file=e.target.files&&e.target.files[0];if(!file)return;
+    const other=parseM3U(await file.text());const report=$('compareReport');
+    const byUrl=new Map(items.map(x=>[x.url,x])), otherByUrl=new Map(other.map(x=>[x.url,x]));
+    const added=other.filter(x=>!byUrl.has(x.url));
+    const removed=items.filter(x=>!otherByUrl.has(x.url));
+    const changed=other.filter(x=>byUrl.has(x.url)&&(
+      byUrl.get(x.url).name!==x.name||byUrl.get(x.url).group!==x.group||byUrl.get(x.url).logo!==x.logo
+    ));
+    const lines=[`Compare with: ${file.name}`,`Current: ${items.length} · Compared: ${other.length}`,`Added in selected file: ${added.length}`,`Removed from selected file: ${removed.length}`,`Metadata changed: ${changed.length}`,''];
+    if(added.length)lines.push('ADDED',...added.map(x=>'+ '+x.name+' ['+(x.group||'Uncategorized')+']'));
+    if(removed.length)lines.push('REMOVED',...removed.map(x=>'- '+x.name+' ['+(x.group||'Uncategorized')+']'));
+    if(changed.length)lines.push('CHANGED',...changed.map(x=>'~ '+x.name+' ('+x.url+')'));
+    report.textContent=lines.join('\n');
+    downloadText(lines.join('\r\n'),'playlist_compare_'+file.name.replace(/\.[^.]+$/,'')+'.txt');
+    e.target.value='';
+  });
+  // Keyboard shortcuts
+  document.addEventListener('keydown',e=>{
+    const tag=(e.target&&e.target.tagName||'').toLowerCase();
+    if(['input','textarea','select'].includes(tag))return;
+    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='o'){e.preventDefault();$('fileInput').click();}
+    else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='f'){e.preventDefault();$('searchInput').focus();}
+    else if(e.code==='Space'){e.preventDefault();if(video.paused)video.play().catch(()=>{});else video.pause();}
+    else if(e.key.toLowerCase()==='f'){if(video.requestFullscreen)video.requestFullscreen().catch(()=>{});}
+    else if(e.key.toLowerCase()==='p')$('pipBtn').click();
+    else if(e.key==='ArrowRight')video.currentTime=Math.min((video.duration||Infinity),video.currentTime+10);
+    else if(e.key==='ArrowLeft')video.currentTime=Math.max(0,video.currentTime-10);
+  });
+  // Restore saved settings and playlists.
+  const savedSettings=readStore('m3u_settings',{theme:'dark'});
+  $('themeSelect').value=savedSettings.theme==='light'?'light':'dark';
+  document.body.classList.toggle('light',$('themeSelect').value==='light');
+  refreshSavedPlaylists();
+  video.addEventListener('loadedmetadata',refreshTracks);
+  video.addEventListener('playing',refreshTracks);
+  video.addEventListener('playing',()=>setStatus('Playing stream.','good'));
+  video.addEventListener('waiting',()=>setStatus('Buffering stream…'));
+  video.addEventListener('error',()=>{if(video.error)setStatus('Playback error. The stream may be offline, unsupported, or blocked by browser CORS policy.','bad');});
+
+
+
+  // Settings live in the top Settings menu; player utility controls stay beside the video.
+  const settingsButton=document.querySelector('.nav-settings');
+  settingsButton?.addEventListener('click',()=>{
+    const pop=$('settingsPopover');
+    if(pop) pop.hidden=!pop.hidden;
+  });
+  document.addEventListener('click',e=>{
+    const pop=$('settingsPopover');
+    if(pop && !pop.hidden && !pop.contains(e.target) && !e.target.closest('.nav-settings')) pop.hidden=true;
+  });
+  $('customFullscreenBtn')?.addEventListener('click',async()=>{
+    const v=$('video');
+    try{
+      if(document.fullscreenElement){await document.exitFullscreen();}
+      else if(v.requestFullscreen){await v.requestFullscreen();}
+      else if(v.webkitEnterFullscreen){v.webkitEnterFullscreen();}
+    }catch(e){setStatus('Fullscreen is not available in this browser.','bad');}
+  });
+  $('pipBtn')?.addEventListener('click',async()=>{
+    const v=$('video');
+    try{
+      if(document.pictureInPictureElement) await document.exitPictureInPicture();
+      else if(document.pictureInPictureEnabled && v.requestPictureInPicture) await v.requestPictureInPicture();
+      else setStatus('Picture-in-Picture is not supported for this video.','bad');
+    }catch(e){setStatus('Picture-in-Picture is unavailable for this stream.','bad');}
+  });
+  const miniLog=$('healthMiniLog');
+  const report=$('healthReport');
+  if(miniLog && report){
+    const syncHealthLog=()=>{
+      const value=report.textContent.trim();
+      if(value) miniLog.textContent=value;
+      else if(!miniLog.textContent.trim()) miniLog.textContent='Health check has not started.';
+    };
+    new MutationObserver(syncHealthLog).observe(report,{childList:true,characterData:true,subtree:true});
+    syncHealthLog();
+  }
+  $('toggleHealthLog')?.addEventListener('click',()=>{
+    const log=$('healthMiniLog'); if(!log)return;
+    log.hidden=!log.hidden;
+    $('toggleHealthLog').textContent=log.hidden?'Show':'Hide';
+  });
+
+  // Header navigation and mirrored Browse/Open URL actions.
+  $('fileInputMirror')?.addEventListener('change', async e=>{
+    const file=e.target.files && e.target.files[0]; if(!file)return;
+    try{loadText(await file.text(),file.name);}catch(err){setStatus('Could not read selected file.','bad');}
+    e.target.value='';
+  });
+  $('focusUrlBtn')?.addEventListener('click',()=>{$('urlInput').focus();$('urlInput').select();});
+  document.querySelectorAll('.main-nav [data-target]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const target=$(btn.dataset.target);
+      if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
+      document.querySelectorAll('.main-nav button').forEach(b=>b.style.filter='brightness(.92)');
+      btn.style.filter='brightness(1.12)';
+    });
+  });
+
+  // Dashboard companion controls and live summary panels.
+  function updateDashboardStats() {
+    const cats = [...new Set(items.map(x=>x.group).filter(Boolean))];
+    const urls = items.map(x=>(x.url||'').trim());
+    const duplicates = urls.length - new Set(urls).size;
+    const put=(id,val)=>{const el=$(id);if(el)el.textContent=String(val);};
+    put('statTotal',items.length); put('statCategories',cats.length);
+    put('statLogos',items.filter(x=>x.logo).length); put('statDuplicates',duplicates);
+    const health=[...healthResults.values()];
+    put('statReachable',health.filter(x=>x.status==='reachable').length);
+    put('statErrors',health.filter(x=>x.status==='error').length);
+    put('statUnknown',health.filter(x=>x.status==='unknown').length);
+    put('channelCountBadge',items.length+' channels');
+    put('currentPlaylistLabel',($('playlistName')?.textContent && $('playlistName').textContent!=='No file selected.') ? $('playlistName').textContent : 'Load a playlist to begin');
+    const chips=$('categoryChips');
+    if(chips){
+      chips.innerHTML='';
+      const all=document.createElement('span');all.className='category-chip';all.textContent='All ';
+      const allCount=document.createElement('span');allCount.className='chip-count';allCount.textContent=items.length;all.append(allCount);
+      all.addEventListener('click',()=>{$('categoryFilter').value='';renderChannels();});
+      chips.append(all);
+      cats.sort((a,b)=>a.localeCompare(b)).forEach(cat=>{
+        const chip=document.createElement('span');chip.className='category-chip';chip.textContent=cat+' ';
+        const count=document.createElement('span');count.className='chip-count';count.textContent=items.filter(x=>x.group===cat).length;chip.append(count);
+        chip.addEventListener('click',()=>{$('categoryFilter').value=cat;renderChannels();});
+        chips.append(chip);
+      });
+    }
+  }
+  $('playerMarkVisible')?.addEventListener('click',()=>$('selectVisibleBtn').click());
+  $('playerClearMarks')?.addEventListener('click',()=>$('clearSelectionBtn').click());
+  $('playerCreateMarked')?.addEventListener('click',()=>$('createSelectedBtn').click());
+  $('leftCheckAll')?.addEventListener('click',()=>$('healthBtn').click());
+  $('leftRetry')?.addEventListener('click',()=>$('retryFailedBtn').click());
+  $('playerPlayNext')?.addEventListener('click',()=>{
+    if(!items.length){setStatus('Load a playlist first.','bad');return;}
+    const next=active<0?0:(active+1)%items.length;
+    active=next;addHistory(items[next]);renderChannels();playUrl(items[next].url,items[next].name);
+  });
+  $('healthFilter')?.addEventListener('change',renderChannels);
+  document.querySelector('.all-chip')?.addEventListener('click',()=>{
+    $('categoryFilter').value=''; $('healthFilter').value='all'; $('searchInput').value=''; renderChannels();
+  });
+  document.querySelector('.fav-chip')?.addEventListener('click',()=>showCollection('m3u_favorites','Favorites'));
+  // Refresh the dashboard stats whenever playlist rows, status, or category chips change.
+  const statsObserver=new MutationObserver(updateDashboardStats);
+  statsObserver.observe($('channels'),{childList:true,subtree:true});
+  const playlistObserver=new MutationObserver(updateDashboardStats);
+  playlistObserver.observe($('playlistName'),{childList:true,characterData:true,subtree:true});
+  updateDashboardStats();
+
+
+
+  // Keep latest health details permanently visible as requested.
+  const alwaysVisibleHealthLog=$('healthMiniLog');
+  if(alwaysVisibleHealthLog) alwaysVisibleHealthLog.hidden=false;
+  const healthLogToggle=$('toggleHealthLog');
+  if(healthLogToggle) healthLogToggle.style.display='none';
+
+  // About dialog for SC Android Studio.
+  $('aboutBtn')?.addEventListener('click',()=> $('aboutBackdrop')?.classList.add('open'));
+  $('aboutCloseBtn')?.addEventListener('click',()=> $('aboutBackdrop')?.classList.remove('open'));
+  $('aboutBackdrop')?.addEventListener('click',e=>{if(e.target===$('aboutBackdrop'))$('aboutBackdrop').classList.remove('open');});
+
+})();
+</script>
+
+<script src="https://eservicebd24.github.io/shared-shell-loader.js" defer=""></script><div id="esbd-footer-slot"></div><script src="https://eservicebd24.github.io/common.js" defer=""></script></body></html>
